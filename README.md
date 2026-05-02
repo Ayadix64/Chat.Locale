@@ -1,4 +1,4 @@
-# Plan.Locale
+# Chat.Locale
 <img src="Picturs/p1.png"></img>
 
 A cross-platform multi-threading peer-to-peer chatting app programmed in C++
@@ -26,8 +26,8 @@ To be honest, what do you think? I speed-ran making it for a competition, and it
 - First of all, download the source file. For sure, you will have source and download zip up there
 To the cool terminal guys
 ``` bash
-git clone https://github.com/chamseddine2009-06/Plan.Locale.git
-cd Plan.Locale
+git clone https://github.com/chamseddine2009-06/Chat.Locale.git
+cd Chat.Locale
 ```
 # Install the Dependencies
 ### Linux
@@ -72,7 +72,7 @@ Here are some useful links:
 ## Compiling
 Note: you need CMake ready on your machine
 ``` bash
-cd Plan.Locale
+cd Chat.Locale
 mkdir build
 cd build
 cmake ..

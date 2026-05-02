@@ -74,7 +74,7 @@ wxBitmap Mat2Bitmap(cv::Mat& frame){
 }
 
 
-cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Plan.Locale" , wxDefaultPosition , wxSize(1200,800)){
+cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , wxSize(1200,800)){
 	
 	satingswindow = new Satings(satingsOpen);
 	//Menus***********************************************************************
@@ -579,7 +579,7 @@ wxCoord cCanvas::OnGetRowHeight(size_t row)const
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 
-Satings::Satings(bool& isopen): wxFrame(nullptr, wxID_ANY, "LocalPlan Satings" , wxDefaultPosition , wxSize(600,800))
+Satings::Satings(bool& isopen): wxFrame(nullptr, wxID_ANY, "Chat.Locale Satings" , wxDefaultPosition , wxSize(600,800))
 {
 	wxSizer* rootS = new wxBoxSizer(wxVERTICAL);
 	wxFont satingsF(wxFontInfo(wxSize(0,18)).Bold());
