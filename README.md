@@ -1,23 +1,23 @@
 # Plan.Locale
 <img src="Picturs/p1.png"></img>
 
-A cross platform multi-threading pear to pear chating app was programed in C++
+A cross-platform multi-threading peer-to-peer chatting app programmed in C++
 
-this  app still on alpha, aka prototype, aka not stabel
+This app is still in alpha, aka prototype, aka not stable
 
-it uses:
+It uses:
 - ASIO as the network library
-- wxWidgets as the gui library
+- wxWidgets as the GUI library
 - OpenCV for camera capturing
-- PortAudio for Audio capturing
+- PortAudio for audio capturing
 
-it can:
-- share camera video / audio
-- sende mesages 
-- sende files
+It can:
+- Share camera video/audio
+- Send messages
+- Send files
 
-*AND No Server betwen them, you device is a server and a cleint in the same time*
+*AND no server between them—your device is a server and a client at the same time*
 
-the code it selfe is expermentale, but i still devolping it to make it as stabel as posible
+The code itself is experimental, but I'm still developing it to make it as stable as possible.
 
-tbh, what do you think, i speed run makeing it for a competition, and it is probably the worst code that i ever made
+To be honest, what do you think? I speed-ran making it for a competition, and it's probably the worst code I've ever written.
