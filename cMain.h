@@ -1,7 +1,8 @@
 #ifndef CMAIN
 #define CMAIN
-#include <memory_resource>
 #include <wx/wx.h>
+#include <memory_resource>
+
 #include <vector>
 #include <wx/gtk/checkbox.h>
 #include <wx/gtk/frame.h>
@@ -28,7 +29,7 @@ struct Msgs{
 	std::string sendr;
 	bool isItAfile=false;
 	std::string mesage;//if it is a file , this will be the file name.
-	
+
 };//i run out of names
 
 
@@ -43,7 +44,7 @@ private:
 	unsigned int rowH = 20;
 	virtual wxCoord OnGetRowHeight(size_t n)const;
 //	virtual wxCoord OnGetColumnWidth(size_t col)const;
-	
+
 	wxDECLARE_EVENT_TABLE();
 
 };
@@ -60,7 +61,7 @@ public:
 	wxTextCtrl* netdSTb;
 	wxTextCtrl* netdETb;
 	wxCheckBox* teacher;
-		
+
 	wxButton* updateSatings;
 
 	Satings(bool& isopen);
@@ -81,19 +82,20 @@ public:
 	bool satingsOpen = false;
 
 	std::vector<std::vector<Msgs>> mesages;
+	
 	wxStaticBitmap  *imageScreen ;
 
 	int CapturingCamera = 0;
 	bool stopCapturing = false;
 	bool allowRecording = true;
-	
-	
+
+
 	std::vector<wxButton*> btns;
 	bool StopFinding = false;
-	
+
 	bool muteSpekers = false;
 	bool allowSoundRecording = true;
-	
+
 	wxPanel * Menupanel     ;
 	wxPanel * Body          ;
 	wxPanel * Intrcating    ;
@@ -101,24 +103,24 @@ public:
 	wxPanel * DevicesBuPanel;
 
 	wxSizer * rootSizer     ;
-	wxSizer * MenusSizer    ;	
+	wxSizer * MenusSizer    ;
 	wxSizer * BodyS         ;
 	wxSizer * IntractSizer  ;
-	wxSizer * DevSiz        ; 
-	wxSizer * butonsS       ;	
-	
+	wxSizer * DevSiz        ;
+	wxSizer * butonsS       ;
+
 	cCanvas * buttons       ;
 	unsigned int CleintDevID=-1;
 	wxTextCtrl* msgTB;
-	
-		
-	wxButton* bt; 
+
+
+	wxButton* bt;
 	unsigned int ConectionsNumber= 0;
 
 	wxTextCtrl *devTarg;
-	
+
 	wxTimer* timer=nullptr;
-	
+
 
 	void OnDevConButon(wxCommandEvent& evt);
 	void OnTextBoxPressEnter(wxCommandEvent& evt);
@@ -126,7 +128,7 @@ public:
 	void OnSatingsButton(wxCommandEvent& evt);
 	void OnIpMan(wxCommandEvent& evt);
 	wxDECLARE_EVENT_TABLE();
-	
+
 	void OnButtonClicked(wxCommandEvent& evnt);
 };
 
@@ -145,7 +147,7 @@ public:
 	wxButton * btn1 = nullptr;
 	wxButton* btn2 = nullptr;
 		//wxDECLARE_EVENT_TABLE();
-	
+
 	void OnButtonClicked(wxCommandEvent& evnt);
 };
 

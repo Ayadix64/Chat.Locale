@@ -3,7 +3,7 @@ project(main)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Debug) #remeber to delet this if you want a user app, this increase the app length to better debug
-
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 #find_package(Qt6 REQUIRED COMPONENTS Widgets)
 find_package( OpenCV REQUIRED )

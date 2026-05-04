@@ -1,6 +1,6 @@
 #ifndef LOCAL_PLAN_NETWORKING
 #define LOCAL_PLAN_NETWORKING
- 
+
 
 #include "login.hpp"
 #include <algorithm>
@@ -73,7 +73,7 @@ struct Packat {
 		unsigned int  TYPE  = PING       ;
 		unsigned long Mgic  = MAGIC      ;
 		unsigned int  msgL  = 0          ;
-		char data [PACKAT-PACK_HS]; 
+		char data [PACKAT-PACK_HS];
 }__attribute__((packed)) ;
 
 struct Message{
@@ -83,7 +83,7 @@ struct Message{
 
 };
 struct FileMs {//it livs in Message::MES
-		
+
 		unsigned int fileNameL = 0       ;
 		unsigned int partN     = 0       ;
 		unsigned int dataSize  = 0       ;
@@ -96,13 +96,13 @@ struct ImageMs {//it livs in Message::MES
 		unsigned int ImgWidht  = 0       ;
 		unsigned int ImgHight  = 0       ;
 
-		char data [PACKAT-PACK_HS-12] ;
+		char data [PACKAT-PACK_HS-12]    ;
 }__attribute__((packed)) ;
 
 
 struct SoundMs {//it livs in Message::MES
-		unsigned int packN     = 0       ;
-		unsigned int Size      = 0       ;//this one is float , so size*sizeof(float) , iow : devide the size to 4
+		unsigned int packN     = 0         ;
+		unsigned int Size      = 0         ;//this one is float , so size*sizeof(float) , iow : devide the size to 4
 
 		float data [(PACKAT-PACK_HS-8)/4]  ;
 }__attribute__((packed)) ;
@@ -169,11 +169,11 @@ class DevInNetwork :public std::enable_shared_from_this<DevInNetwork>
 
 	void FindHandler();
 
-	DevInNetwork(asio::io_context & io , ip::tcp::endpoint& ep);	
+	DevInNetwork(asio::io_context & io , ip::tcp::endpoint& ep);
 	~DevInNetwork();
-	
+
 	void connect();
-	
+
 };
 
 #endif

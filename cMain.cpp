@@ -1,4 +1,5 @@
 #include <asio/ip/address_v4.hpp>
+#include <ostream>
 #include <wx/wx.h>
 #include <cstring>
 
@@ -75,21 +76,21 @@ wxBitmap Mat2Bitmap(cv::Mat& frame){
 
 
 cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , wxSize(1200,800)){
-	
+
 	satingswindow = new Satings(satingsOpen);
 	//Menus***********************************************************************
 	wxFont headLineF(wxFontInfo(wxSize(0,36)).Bold());
 	wxFont dicriptionF(wxFontInfo(wxSize(0,18)).Bold());
-	
+
 	Menupanel = new wxPanel(this, wxID_ANY,wxDefaultPosition , wxDefaultSize);
-	
+
 	rootSizer =new wxBoxSizer(wxVERTICAL);
 
 	MenusSizer = new wxBoxSizer(wxHORIZONTAL);
-	
+
 	updateLogs();
-	wxStaticText * userHi = new 
-		wxStaticText(Menupanel,wxID_ANY,(wxString)(std::string)("Hi, "+ std::string(g_isTacher?"Professor ":"") + user_name) , wxPoint(20,20) , wxSize(200,-1)); 
+	wxStaticText * userHi = new
+		wxStaticText(Menupanel,wxID_ANY,(wxString)(std::string)("Hi, "+ std::string(g_isTacher?"Professor ":"") + user_name) , wxPoint(20,20) , wxSize(200,-1));
 	wxButton* satings = new wxButton(Menupanel,wxID_ANY ,  wxString::FromUTF8("\u2699") , wxDefaultPosition , wxSize(40,40) , wxBORDER_NONE);
 	satings->SetFont(headLineF);
 	satings->Bind(wxEVT_COMMAND_BUTTON_CLICKED,&cMain::OnSatingsButton,this);
@@ -101,47 +102,43 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 	MenusSizer->Add(satings);
 	Menupanel->SetSizerAndFit(MenusSizer);
 	MenusSizer->Layout();
-	
 	rootSizer->Add(Menupanel , 0 ,wxEXPAND|wxALL);
 	//Body***********************************************************************
+
 	BodyS = new wxBoxSizer(wxHORIZONTAL);
 	Body = new wxPanel(this);
 	//screen Panel ///////////////////////////////////////////
 	Intrcating = new wxPanel(Body);//dcreen vew + messaging
 	IntractSizer = new wxBoxSizer(wxVERTICAL);
-	
+
 	wxPanel *screenVe = new wxPanel(Intrcating);
 	wxInitAllImageHandlers();
-	
-		
+
+
 	wxBitmap bitmap("empty.png" , wxBITMAP_TYPE_PNG);
 
 	imageScreen = new wxStaticBitmap(screenVe ,wxID_ANY, bitmap , wxPoint(0,0) );
-	imageScreen->SetParent(screenVe);
 	
-	IntractSizer->Add(screenVe , 2 , wxEXPAND|wxALL,10);
+
+	screenVe->Bind(wxEVT_SIZE,[&](wxSizeEvent sev){
+		if(imageScreen->GetBitmap().IsOk()){
+			wxImage* img = new wxImage(imageScreen->m_width, imageScreen->m_height,(unsigned char*)imageScreen->GetBitmap().GetPixbuf());
+			imageScreen->SetBitmap(img->Scale(sev.GetSize().GetWidth(), sev.GetSize().GetHeight()));
+		}
+		sev.Skip();
+	});
 	
+
+	IntractSizer->Add(screenVe , 5 , wxEXPAND|wxALL,10);
+	screenVe->SetBackgroundColour(wxColour(0,0,0,255));
 
 
 
 	wxPanel* mesaging = new wxPanel(Intrcating);
 	wxSizer * mesageSzr = new wxBoxSizer(wxVERTICAL);
-	
-	wxPanel* mesages = new wxPanel(mesaging);	
-	
-	wxScrolledWindow* msgScroler = new wxScrolledWindow(mesages);
-	wxSizer* msgScrollSizer =new wxBoxSizer(wxVERTICAL);
-	
-	msgScroler->SetScrollRate(5, 5);
 
 
 
-
-	msgScroler->SetSizer(msgScrollSizer);
-	
-	
-	mesageSzr->Add(mesages ,2, wxEXPAND|wxALL,5);
-	
 	wxPanel* sender = new wxPanel(mesaging);
 	wxSizer* senderSizer= new wxBoxSizer(wxHORIZONTAL);
 	msgTB = new wxTextCtrl(sender,wxID_ANY , "" , wxPoint(0,30),wxSize(300,-1) , wxTE_PROCESS_ENTER);
@@ -158,11 +155,11 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 	sender->SetSizer(senderSizer);
 	senderSizer->Layout();
 
-	mesageSzr->Add(sender,0,wxEXPAND|wxLEFT|wxRIGHT);	
+	mesageSzr->Add(sender,0,wxEXPAND|wxLEFT|wxRIGHT);
 	mesaging->SetSizer(mesageSzr);
 	mesageSzr->Layout();
-	
-	IntractSizer->Add(mesaging, 5 , wxEXPAND|wxALL,10);
+
+	IntractSizer->Add(mesaging, 1 , wxEXPAND|wxALL,10);
 
 
 
@@ -170,55 +167,65 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 
 	Intrcating->SetSizerAndFit(IntractSizer);
 	IntractSizer->Layout();
-	
-	BodyS->Add(Intrcating,5,wxEXPAND);
-	
+
+	BodyS->Add(Intrcating,2,wxEXPAND|wxALL);
+
 
 	DevicesBuPanel = new wxPanel(Body);
  	DevSiz = new wxBoxSizer(wxVERTICAL);
-	
+
 	buttons = new cCanvas(DevicesBuPanel);
 	butonsS = new wxBoxSizer(wxVERTICAL);
 
 	buttons->SetSizer(butonsS);
 	butonsS->Layout();
-	
+
 	buttons->FitInside();
-	
 
 
-	DevSiz->Add(buttons ,1,  wxALIGN_RIGHT|wxRIGHT , 10);
-	
+
+	DevSiz->Add(buttons ,  wxALIGN_RIGHT|wxRIGHT , 10);
+
 	DevicesBuPanel->SetSizer(DevSiz);
 
 	DevSiz->Layout();
 
-	BodyS->Add(DevicesBuPanel, wxRIGHT|wxEXPAND , 10);
-	
+	BodyS->Add(DevicesBuPanel);
+
 	Body->SetSizerAndFit(BodyS);
 	BodyS->Layout();
 	imageHandlingReq = [&](Image& img,unsigned int id){
-		
+
 		if(id==CleintDevID){
 			char* imageBitMapReseved = (char*)malloc(img.ImgHight*img.ImgWidht*3);
 			memcpy(imageBitMapReseved, img.imgBitmap, img.ImgHight*img.ImgWidht*3);
-			std::shared_ptr<wxImage> image = std::make_shared<wxImage>(img.ImgWidht,img.ImgHight,(uchar*)imageBitMapReseved , true);
-			CallAfter([this,image,imageBitMapReseved](){
+			
+			wxImage* image = new wxImage(img.ImgWidht,img.ImgHight,(uchar*)imageBitMapReseved , true);
+			
+			CallAfter([this,image,imageBitMapReseved,screenVe](){
+			    	unsigned int ix = imageScreen->m_width, iy = imageScreen->m_height;
+				
 				imageScreen->SetBitmap(wxBitmap(*image));
+				std::cout<<std::endl<<screenVe->m_height;
+			    	
+				if(ix!=image->GetWidth()||iy!=image->GetWidth()){
+                  			  BodyS->Layout();
+				}
 				free(imageBitMapReseved);
+				delete image;
 			});
 		}
-		return ;		
-		
+		return ;
+
 	};
 	rootSizer->Add(Body ,1, wxEXPAND);
-		
+
 
 
 	this->SetSizer(rootSizer);
 	rootSizer->Layout();
-	
-	
+
+
 
 
 
@@ -243,11 +250,11 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 
 
 	//Set up Capturing thread ////////////////////////////////////////////////////////////////////////
-	
+
 	cameraCapturingReq = [&](unsigned int w , unsigned int h , unsigned char* data){
 		//logMsgs("SENDING IMAGE");
 		if(CleintDevID!=-1 && getConPos(this->CleintDevID)!=-1 && !g_isTacher){
-			cone[getConPos(CleintDevID)]->sendImage(h, w,data);	
+			cone[getConPos(CleintDevID)]->sendImage(h, w,data);
 		}else if(g_isTacher){
 			for(int i = 0 ; i < cone.size() ; i++){
 				if( i < cone.size() && cone[i]->getID() != -1){
@@ -255,32 +262,32 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 				}
 				return ;
 			}
-			
+
 		}
 
 	};
-	
+
 	timer = new wxTimer(this);
 
-	
+
 	Bind(wxEVT_TIMER,[&](wxEvent &e){
-		
+
 		for( ; ConectionsNumber<cone.size() ; ConectionsNumber++){
-				
-				
+
+
 				bt= new wxButton(buttons,START_DEV_BUT_ID+ConectionsNumber,(wxString)cone[ConectionsNumber]->name , wxDefaultPosition , wxDefaultSize);
 				btns.push_back(bt);
 				btns[ConectionsNumber]->Bind(wxEVT_COMMAND_BUTTON_CLICKED,&cMain::OnDevConButon,this);
 				butonsS->Add(btns[ConectionsNumber],1,wxTOP,5);
 				buttons->SetRowH(btns[ConectionsNumber]->m_height +5);
 				buttons->SetRowCount(ConectionsNumber);
-				//buttons->FitInside();	
+				//buttons->FitInside();
 				//butonsS->Layout();
 				//rootSizer->Layout();
 				this->Layout();
 				this->Refresh();
 				this->mesages.resize(ConectionsNumber+1);
-				
+
 		}
 		for(int i = 0 ; i < ConectionsNumber && i < cone.size() ; i++ ){
 			if(btns[i]->GetLabel() != cone[i]->name){
@@ -288,7 +295,7 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 				btns[i]->Refresh();
 			}
 		}
-		
+
 		e.Skip();
 		/*|/| in our app, the cone mutrix dosnt been freed (just if the cleint send CLOSE), |\|*/
 		/*|\| even thogh that is in a side a terrabel memory mangment                       |/|*/
@@ -314,13 +321,13 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 		}
 		return ;
 	};
-	
+
 	readSoundFromMicrophoneHandler = [&](float* r , unsigned int bufferL){
 		if(!g_isTacher && this->CleintDevID != -1 && this->allowSoundRecording && getConPos(this->CleintDevID)!=-1){
 			cone[getConPos(this->CleintDevID)]->sendSound(r, bufferL);
 
 		}else if(g_isTacher && allowSoundRecording){
-			float* cpAu =(float*) malloc(bufferL*4);	
+			float* cpAu =(float*) malloc(bufferL*4);
 			memcpy(cpAu, r, bufferL*4);
 			std::thread([=](){
 				for(int i = 0 ; i < cone.size() ; i++){
@@ -329,7 +336,7 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 						cone[i]->sendSound(cpAu, bufferL);
 					}
 				}
-				
+
 				free(cpAu);
 			}).detach();
 		}
@@ -341,14 +348,14 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 			CleintDevID=-1;
 		}
 		if(btns.size()){
-			
-			
+
+
 			if(this->ConectionsNumber){
 				this->ConectionsNumber--;
 			}
 
 			for(int i = 0 ; i < btns.size()-1  && i < cone.size(); i++){
-				btns[i]->SetLabel(cone[i]->name);//we update buttons, instade of erase , 
+				btns[i]->SetLabel(cone[i]->name);//we update buttons, instade of erase ,
 				btns[i]->Refresh();
 			}
 			butonsS->Show(btns[btns.size()-1],false);
@@ -356,16 +363,16 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 			//butonsS->Detach(btns[btns.size()-1]);
 			//butonsS->Hide(btns[btns.size()-1]);
 			//btns[btns.size()-1]->Show(false);
-			
-			buttons->SetRowCount(ConectionsNumber);	
+
+			buttons->SetRowCount(ConectionsNumber);
 			this->Layout();
 			this->Refresh();
-			
+
 		}
-		
+
 		return ;
 	};
-	
+
 	fileHandlerRequastComplite = [&](std::string fn , unsigned int size , unsigned int ID){
 		CallAfter([=](){
 			if(getConPos(ID)==-1)return ;
@@ -377,8 +384,8 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 
 		});
 		return ;
-	};	
-	
+	};
+
 }
 
 
@@ -399,7 +406,7 @@ cMain::~cMain(){
 
 void cMain:: OnButtonClicked(wxCommandEvent& evnt){
 	//listbox->AppendString(textBox->GetValue());
-	
+
 	wxMessageBox("BUTTON CLICKED");
 	evnt.Skip();
 }
@@ -408,10 +415,10 @@ void cMain:: OnButtonClicked(wxCommandEvent& evnt){
 
 
 void cMain::OnDevConButon(wxCommandEvent&evt){
-	
+
 	CleintDevID = cone[evt.GetId() - START_DEV_BUT_ID]->getID();
 	//cone[CleintDevID]->sendFile("../CMakeLists.txt");
-	
+
 
 }
 
@@ -421,7 +428,7 @@ void cMain::OnIpMan(wxCommandEvent& evt){
 	ip::tcp::endpoint endp(ip::make_address_v4(conect_to) , LISNT_PORT);
 	unsigned int coneN =  addConection(endp,contextOUT);
 	cone[coneN]->ping();
-	
+
 	evt.Skip();
 	std::cout<<"RRRRRRRRRRRRRR\n\n" << conect_to<<"\n";
 	*/
@@ -499,37 +506,37 @@ cMainLogIn::cMainLogIn() : wxFrame(nullptr, wxID_ANY, "LOG IN" , wxDefaultPositi
 	wxFont dicriptionF(wxFontInfo(wxSize(0,18)).Bold());
 
 	//wxPanel* panel = new wxPanel(this);
-	
+
 	wxSizer* rootS = new wxBoxSizer(wxVERTICAL);
 
 	wxStaticText* welcome = new wxStaticText(this , wxID_ANY , "Hello Ther!\nYou need to log in",wxPoint(0,22) , wxSize(-1,-1) , wxALIGN_CENTER_HORIZONTAL);
-	
+
 	welcome->SetFont(headLineF);
-	
+
 	rootS->Add(welcome ,0, wxALIGN_CENTER_HORIZONTAL|wxTOP|wxBOTTOM , 10);
 
 	wxStaticText* discrip = new wxStaticText(this, wxID_ANY , "Enter the name that evry one in your network will see\na unicke name or your persenel name is rocomended." ,wxPoint(0,22) , wxSize(500,-1) , wxALIGN_CENTER_HORIZONTAL);
 	rootS->Add(discrip,0,wxALIGN_CENTER_HORIZONTAL|wxALL , 10);
-	
-	
+
+
 	textBox = new wxTextCtrl(this , wxID_ANY , "" , wxPoint(0,30),wxSize(300,-1) , wxALIGN_CENTER_HORIZONTAL);
 	rootS->AddSpacer(50);
 	rootS->AddStretchSpacer(1);
 	rootS->Add(textBox ,0, wxALIGN_CENTER_HORIZONTAL|wxTOP|wxBOTTOM, 20);
 	rootS->AddStretchSpacer(1);
-	
+
 	teacherBox = new wxCheckBox(this,wxID_ANY,"i am a teacher");
 	rootS->Add(teacherBox,0,wxALL|wxALIGN_LEFT,10);
 
 	btn1 = new wxButton(this, wxID_ANY , "Next");
 	btn1->Bind(wxEVT_COMMAND_BUTTON_CLICKED,&cMainLogIn::OnButtonClicked,this);
 	rootS->Add(btn1,0,wxALIGN_RIGHT|wxRIGHT|wxBOTTOM,20);
-	
+
 	this->SetSizerAndFit(rootS);
 
 
 	rootS->Layout();
-	
+
 }
 cMainLogIn::~cMainLogIn(){
 
@@ -542,13 +549,13 @@ void cMainLogIn::OnButtonClicked(wxCommandEvent& evnt){
 		evnt.Skip();
 		workwindow = new cMain();
 		this->Close();
-		soundIOInit();	
+		soundIOInit();
 		workwindow->Show();
 	}else {
 		wxMessageBox("Name is requared");
 	}
-	
-	
+
+
 }
 
 wxBEGIN_EVENT_TABLE(cCanvas, wxVScrolledWindow)
@@ -572,7 +579,7 @@ void cCanvas::SetRowH(unsigned int r){
 wxCoord cCanvas::OnGetRowHeight(size_t row)const
 {
 	wxASSERT( row < GetRowCount() );
-	return wxCoord(rowH);	
+	return wxCoord(rowH);
 }
 
 
@@ -583,7 +590,7 @@ Satings::Satings(bool& isopen): wxFrame(nullptr, wxID_ANY, "Chat.Locale Satings"
 {
 	wxSizer* rootS = new wxBoxSizer(wxVERTICAL);
 	wxFont satingsF(wxFontInfo(wxSize(0,18)).Bold());
-	
+
 	wxSizer* nameSs = new wxBoxSizer(wxHORIZONTAL);
 	wxStaticText* nameText = new wxStaticText(this,wxID_ANY,"device name :");
 	nameText->SetFont(satingsF);
@@ -591,15 +598,15 @@ Satings::Satings(bool& isopen): wxFrame(nullptr, wxID_ANY, "Chat.Locale Satings"
 	nameTb = new wxTextCtrl(this,wxID_ANY);
 	nameTb->SetValue((wxString)user_name);
 	nameSs->Add(nameTb,1,wxALL,10);
-	rootS->Add(nameSs ,0 ,wxEXPAND); 
-	
+	rootS->Add(nameSs ,0 ,wxEXPAND);
+
 
 	wxSizer* dowS = new wxBoxSizer(wxHORIZONTAL);
 	wxStaticText* downladText = new wxStaticText(this,wxID_ANY,"Download Foldare :");
 	downladText->SetFont(satingsF);
 	dowS->Add(downladText , 0 , wxALL|wxALIGN_CENTER_VERTICAL,10);
 	downloadFTb = new wxTextCtrl(this,wxID_ANY);
-	downloadFTb->SetValue((wxString)donwloadF); 
+	downloadFTb->SetValue((wxString)donwloadF);
 	dowS->Add(downloadFTb,1,wxALL|wxALIGN_CENTER_VERTICAL,10);
 	rootS->Add(dowS,1,wxEXPAND);
 
@@ -609,7 +616,7 @@ Satings::Satings(bool& isopen): wxFrame(nullptr, wxID_ANY, "Chat.Locale Satings"
 	netSText->SetFont(satingsF);
 	netSs->Add(netSText , 0 , wxALL|wxALIGN_CENTER_VERTICAL,10);
 	netdSTb = new wxTextCtrl(this,wxID_ANY);
-	netdSTb->SetValue((wxString)networkDiscoverBase); 
+	netdSTb->SetValue((wxString)networkDiscoverBase);
 	netSs->Add(netdSTb,1,wxALL|wxALIGN_CENTER_VERTICAL,10);
 	rootS->Add(netSs,1,wxEXPAND);
 
@@ -621,16 +628,16 @@ Satings::Satings(bool& isopen): wxFrame(nullptr, wxID_ANY, "Chat.Locale Satings"
 	netdETb->SetValue((wxString)networkDiscoverEnd);
 	netES->Add(netdETb,1,wxALL|wxALIGN_CENTER_VERTICAL,10);
 	rootS->Add(netES,1,wxEXPAND);
-	
+
 
 	teacher = new wxCheckBox(this,wxID_ANY,"i am a teacher");
 	teacher->SetValue(g_isTacher);
-	
+
 	rootS->Add(teacher,1,wxALL,10);
-	
+
 
 	updateSatings=new wxButton(this,wxID_ANY,"Update Satings");
-	updateSatings->Bind(wxEVT_COMMAND_BUTTON_CLICKED,&Satings::OnUpdateSatings , this);	
+	updateSatings->Bind(wxEVT_COMMAND_BUTTON_CLICKED,&Satings::OnUpdateSatings , this);
 	rootS->Add(updateSatings,0,wxALL|wxALIGN_CENTER_HORIZONTAL,10);
 
 
@@ -642,7 +649,7 @@ Satings::Satings(bool& isopen): wxFrame(nullptr, wxID_ANY, "Chat.Locale Satings"
 	rootS->Layout();
 	this->SetSizerAndFit(rootS);
 	this->Layout();
-	return;		
+	return;
 }
 
 Satings::~Satings()
@@ -651,7 +658,7 @@ Satings::~Satings()
 }
 
 void Satings::OnUpdateSatings(wxCommandEvent & evt){
-	
+
 	setLogs((std::string)nameTb->GetValue(), (std::string)downloadFTb->GetValue(), (std::string)netdSTb->GetValue(), (std::string)netdETb->GetValue(), teacher->GetValue());
 	evt.Skip();
 }

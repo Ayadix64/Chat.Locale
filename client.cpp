@@ -31,7 +31,6 @@ connection::connection(ip::tcp::socket& skt , io_context &io , std::vector <std:
 connection::~connection(){
 	delete io;
 }
-	
 
 
 
@@ -129,14 +128,15 @@ void connection::sendFile(std::string fileP)
 			sk.wait(sk.wait_read);
 			sk.read_some(buffer(&ready,PACKAT));
 			sk.write_some(buffer(&ms,PACKAT));
-			sk.wait(sk.wait_write);
 			dataWroten+=writ;
 			if(ec){
 				logMsgs("ERROR SENDING FILE", ec.message());
-				//closeSocket(sk);
+				closeSocket(sk);
 				FREE(mlc);
 				return ;
 			}
+
+			sk.wait(sk.wait_write);
 		}
 		
 		ifl.close();
@@ -163,6 +163,7 @@ void connection::sendImage(unsigned int hight , unsigned int width , unsigned ch
 		error_code ec;
 		ip::tcp::socket sk(*io);
 		sk.connect(ip::tcp::endpoint(this->adress, LISNT_PORT) , ec);
+		
 		//sk.connect(ip::tcp::endpoint(this->adress, LISNT_PORT),ec);
 		if(ec || !sk.is_open()){
 			logMsgs("ERROR SENDING IMAGE", ec.message());
@@ -220,7 +221,16 @@ void connection::sendImage(unsigned int hight , unsigned int width , unsigned ch
 			memcpy(ms.data, &ims, std::min(sizeof(ms.data) , sizeof(ims)));
 			
 			sk.write_some(buffer(&ms,PACKAT),ec);
-			
+			if(ec){
+				logMsgs("ERROR SENDING IMAGE", ec.message());
+				closeSocket(sk);
+				if(imgData!=nullptr){
+					FREE(imgData);
+					imgData=nullptr;
+				}
+				return ;
+			}
+			sk.wait(sk.wait_write);
 			dataWroten+=writ;
 			
 		}
@@ -313,6 +323,7 @@ void connection::sendSound(float* data__ , unsigned int ln){//NOTE:if somthing b
 				}
 				return ;
 			}
+			sk.wait(sk.wait_write);
 		
 		}
 		if(data!=nullptr){

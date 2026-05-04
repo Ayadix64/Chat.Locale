@@ -1,5 +1,6 @@
 #include "camera.hpp"
 #include "utils.hpp"
+#include <atomic>
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
@@ -22,7 +23,7 @@ std::function<void(unsigned int width,unsigned int heigth, unsigned char* data )
 std::thread sendThread;
 std::thread capturingThread;
 
-bool ThreadsSholdExit = false;
+std::atomic<bool> ThreadsSholdExit = false;
 
 bool CameraHaveBeenChanged = false;
 unsigned int CameraNumber = 0;
@@ -49,20 +50,20 @@ void CapturingThrFn(){
 	while (!ThreadsSholdExit) {
 		if(cam.isOpened()){
 			cam.read(buffer);
-			
+
 			cv::cvtColor(buffer, frame,cv::COLOR_BGR2RGB);
 
-			if(CameraHaveBeenChanged){	
+			if(CameraHaveBeenChanged){
 				if(data!=NULL){
 					free(data);
 				}
-				
+
 				data=NULL;
 				h=frame.rows;
 				w=frame.cols;
 				data = (unsigned char*)malloc(h*w*3);
 				memset(data, 0, h*w*3);
-			
+
 				CameraHaveBeenChanged=false;
 			}
 			if(data!=NULL){
@@ -79,7 +80,7 @@ void CameraStart(){
 	if(cam.isOpened()){
 		CameraHaveBeenChanged=true;
 		ThreadsSholdExit=false;
-		
+
 		capturingThread = std::thread(CapturingThrFn);
 		sendThread = std::thread(SendingThreadFn);
 	}else {
