@@ -1,0 +1,68 @@
+[
+{
+  "directory": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/build",
+  "command": "/usr/bin/c++ -DWXUSINGDLL -D_FILE_OFFSET_BITS=64 -D__WXGTK3__ -D__WXGTK__ -isystem /usr/local/include/opencv4 -isystem /usr/lib/wx/include/gtk3-unicode-3.2 -isystem /usr/include/wx-3.2 -g -std=gnu++17 -o CMakeFiles/main.dir/main.cpp.o -c \"/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/main.cpp\"",
+  "file": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/main.cpp",
+  "output": "CMakeFiles/main.dir/main.cpp.o"
+},
+{
+  "directory": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/build",
+  "command": "/usr/bin/c++ -DWXUSINGDLL -D_FILE_OFFSET_BITS=64 -D__WXGTK3__ -D__WXGTK__ -isystem /usr/local/include/opencv4 -isystem /usr/lib/wx/include/gtk3-unicode-3.2 -isystem /usr/include/wx-3.2 -g -std=gnu++17 -o CMakeFiles/main.dir/cApp.cpp.o -c \"/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/cApp.cpp\"",
+  "file": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/cApp.cpp",
+  "output": "CMakeFiles/main.dir/cApp.cpp.o"
+},
+{
+  "directory": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/build",
+  "command": "/usr/bin/c++ -DWXUSINGDLL -D_FILE_OFFSET_BITS=64 -D__WXGTK3__ -D__WXGTK__ -isystem /usr/local/include/opencv4 -isystem /usr/lib/wx/include/gtk3-unicode-3.2 -isystem /usr/include/wx-3.2 -g -std=gnu++17 -o CMakeFiles/main.dir/cMain.cpp.o -c \"/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/cMain.cpp\"",
+  "file": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/cMain.cpp",
+  "output": "CMakeFiles/main.dir/cMain.cpp.o"
+},
+{
+  "directory": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/build",
+  "command": "/usr/bin/c++ -DWXUSINGDLL -D_FILE_OFFSET_BITS=64 -D__WXGTK3__ -D__WXGTK__ -isystem /usr/local/include/opencv4 -isystem /usr/lib/wx/include/gtk3-unicode-3.2 -isystem /usr/include/wx-3.2 -g -std=gnu++17 -o CMakeFiles/main.dir/networking.cpp.o -c \"/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/networking.cpp\"",
+  "file": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/networking.cpp",
+  "output": "CMakeFiles/main.dir/networking.cpp.o"
+},
+{
+  "directory": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/build",
+  "command": "/usr/bin/c++ -DWXUSINGDLL -D_FILE_OFFSET_BITS=64 -D__WXGTK3__ -D__WXGTK__ -isystem /usr/local/include/opencv4 -isystem /usr/lib/wx/include/gtk3-unicode-3.2 -isystem /usr/include/wx-3.2 -g -std=gnu++17 -o CMakeFiles/main.dir/client.cpp.o -c \"/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/client.cpp\"",
+  "file": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/client.cpp",
+  "output": "CMakeFiles/main.dir/client.cpp.o"
+},
+{
+  "directory": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/build",
+  "command": "/usr/bin/c++ -DWXUSINGDLL -D_FILE_OFFSET_BITS=64 -D__WXGTK3__ -D__WXGTK__ -isystem /usr/local/include/opencv4 -isystem /usr/lib/wx/include/gtk3-unicode-3.2 -isystem /usr/include/wx-3.2 -g -std=gnu++17 -o CMakeFiles/main.dir/server.cpp.o -c \"/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/server.cpp\"",
+  "file": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/server.cpp",
+  "output": "CMakeFiles/main.dir/server.cpp.o"
+},
+{
+  "directory": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/build",
+  "command": "/usr/bin/c++ -DWXUSINGDLL -D_FILE_OFFSET_BITS=64 -D__WXGTK3__ -D__WXGTK__ -isystem /usr/local/include/opencv4 -isystem /usr/lib/wx/include/gtk3-unicode-3.2 -isystem /usr/include/wx-3.2 -g -std=gnu++17 -o CMakeFiles/main.dir/config.cpp.o -c \"/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/config.cpp\"",
+  "file": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/config.cpp",
+  "output": "CMakeFiles/main.dir/config.cpp.o"
+},
+{
+  "directory": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/build",
+  "command": "/usr/bin/c++ -DWXUSINGDLL -D_FILE_OFFSET_BITS=64 -D__WXGTK3__ -D__WXGTK__ -isystem /usr/local/include/opencv4 -isystem /usr/lib/wx/include/gtk3-unicode-3.2 -isystem /usr/include/wx-3.2 -g -std=gnu++17 -o CMakeFiles/main.dir/login.cpp.o -c \"/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/login.cpp\"",
+  "file": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/login.cpp",
+  "output": "CMakeFiles/main.dir/login.cpp.o"
+},
+{
+  "directory": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/build",
+  "command": "/usr/bin/c++ -DWXUSINGDLL -D_FILE_OFFSET_BITS=64 -D__WXGTK3__ -D__WXGTK__ -isystem /usr/local/include/opencv4 -isystem /usr/lib/wx/include/gtk3-unicode-3.2 -isystem /usr/include/wx-3.2 -g -std=gnu++17 -o CMakeFiles/main.dir/camera.cpp.o -c \"/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/camera.cpp\"",
+  "file": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/camera.cpp",
+  "output": "CMakeFiles/main.dir/camera.cpp.o"
+},
+{
+  "directory": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/build",
+  "command": "/usr/bin/c++ -DWXUSINGDLL -D_FILE_OFFSET_BITS=64 -D__WXGTK3__ -D__WXGTK__ -isystem /usr/local/include/opencv4 -isystem /usr/lib/wx/include/gtk3-unicode-3.2 -isystem /usr/include/wx-3.2 -g -std=gnu++17 -o CMakeFiles/main.dir/soundIO.cpp.o -c \"/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/soundIO.cpp\"",
+  "file": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/soundIO.cpp",
+  "output": "CMakeFiles/main.dir/soundIO.cpp.o"
+},
+{
+  "directory": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/build",
+  "command": "/usr/bin/c++ -DWXUSINGDLL -D_FILE_OFFSET_BITS=64 -D__WXGTK3__ -D__WXGTK__ -isystem /usr/local/include/opencv4 -isystem /usr/lib/wx/include/gtk3-unicode-3.2 -isystem /usr/include/wx-3.2 -g -std=gnu++17 -o CMakeFiles/main.dir/screenCapturing.cpp.o -c \"/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/screenCapturing.cpp\"",
+  "file": "/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/screenCapturing.cpp",
+  "output": "CMakeFiles/main.dir/screenCapturing.cpp.o"
+}
+]

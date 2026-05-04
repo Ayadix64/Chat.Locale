@@ -1,0 +1,3 @@
+/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/build/CMakeFiles/main.dir
+/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/build/CMakeFiles/edit_cache.dir
+/home/Ayadi/Desktop/projects/Ayadi_Network_Isolation_And_Backup_System (A.N.I.A.B.S)/Test4_Gui_wxWidgets/build/CMakeFiles/rebuild_cache.dir
