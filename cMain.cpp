@@ -1,6 +1,4 @@
 #include <asio/ip/address_v4.hpp>
-#include <ostream>
-#include <wx/wx.h>
 #include <cstring>
 
 #include <cstdio>
@@ -9,6 +7,7 @@
 #include <memory>
 #include <unistd.h>
 
+#include <wx/wx.h>
 #include <wx/filedlg.h>
 #include <wx/gtk/filedlg.h>
 #include <wx/string.h>
@@ -59,8 +58,10 @@
 #include "cApp.h"
 #include "camera.hpp"
 #include "client.hpp"
+
+
+
 wxBEGIN_EVENT_TABLE(cMain, wxFrame)
-//	EVT_BUTTON(1001, cMain::OnButtonClicked)
 wxEND_EVENT_TABLE()
 
 
@@ -120,17 +121,7 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 	imageScreen = new wxStaticBitmap(screenVe ,wxID_ANY, bitmap , wxPoint(0,0) );
 	
 
-	screenVe->Bind(wxEVT_SIZE,[&](wxSizeEvent sev){
-		if(imageScreen->GetBitmap().IsOk()){
-			wxImage* img = new wxImage(imageScreen->m_width, imageScreen->m_height,(unsigned char*)imageScreen->GetBitmap().GetPixbuf());
-			imageScreen->SetBitmap(img->Scale(sev.GetSize().GetWidth(), sev.GetSize().GetHeight()));
-		}
-		sev.Skip();
-	});
-	
-
 	IntractSizer->Add(screenVe , 5 , wxEXPAND|wxALL,10);
-	screenVe->SetBackgroundColour(wxColour(0,0,0,255));
 
 
 
@@ -206,11 +197,10 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 			    	unsigned int ix = imageScreen->m_width, iy = imageScreen->m_height;
 				
 				imageScreen->SetBitmap(wxBitmap(*image));
-				std::cout<<std::endl<<screenVe->m_height;
 			    	
-				if(ix!=image->GetWidth()||iy!=image->GetWidth()){
+				/*if(ix!=image->GetWidth()||iy!=image->GetWidth()){
                   			  BodyS->Layout();
-				}
+				}*/
 				free(imageBitMapReseved);
 				delete image;
 			});
@@ -401,16 +391,6 @@ cMain::~cMain(){
 	networking_stop();
 	return;
 }
-
-
-
-void cMain:: OnButtonClicked(wxCommandEvent& evnt){
-	//listbox->AppendString(textBox->GetValue());
-
-	wxMessageBox("BUTTON CLICKED");
-	evnt.Skip();
-}
-
 
 
 

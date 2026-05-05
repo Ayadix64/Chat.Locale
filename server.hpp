@@ -19,19 +19,20 @@ public:
 
 	std::string Messag_;
 	bool isOpen = false;//is socket open
-	bool isSendingF = false;//is clein sending a file
+	
 	std::string fileName;
 	std::ofstream file;//file pfstrime
 	char* mlc =nullptr;//file buffer
 	unsigned int ptr = 0;//file ptr
-	int fileNS = 0;//file name size
+	unsigned int fileNS = 0;//file name size
+	unsigned int fileS =0;	//file Size
 	
 	char* ImgB =nullptr;//image buffer
 	unsigned int Iptr;//image buffer ptr
 	unsigned int ISize;//image size
 	
-	unsigned int imageWidth;
-	unsigned int imageHeight;
+	unsigned int imageWidth=0;//as it sounds
+	unsigned int imageHeight=0;
 
 	float* SondB =nullptr;//sound buffer
 	unsigned int Sptr;//sound buffer ptr

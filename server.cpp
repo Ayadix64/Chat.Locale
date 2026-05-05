@@ -120,7 +120,7 @@ void server::FileHandler(){
 		}
 		
 		fileNS = fileName.size();
-
+		fileS = msfile->dataSize;
 		/**/
 
 		fileName.insert(0,donwloadF+"/");
@@ -130,7 +130,7 @@ void server::FileHandler(){
 		//file.write((char*)(msfile->data+msfile->fileNameL), std::min((unsigned int)(sizeof(FileMs::data)-msfile->fileNameL) , msfile->dataSize-msfile->fileNameL));
 		
 		ptr=0;
-		for(int i = msfile->fileNameL ; i < std::min((unsigned int)sizeof(FileMs::data) , msfile->dataSize);i++,ptr++){
+		for(int i = msfile->fileNameL ; i < std::min((unsigned int)sizeof(FileMs::data) , fileS);i++,ptr++){
 			mlc[ptr] = msfile->data[i];
 		}
 
@@ -142,7 +142,7 @@ void server::FileHandler(){
 		//file.write(msfile->data, std::min(msfile->dataSize , (unsigned int)((msfile->partN+1)*sizeof(FileMs::data) - msfile->partN*sizeof(FileMs::data))) );
 		
 		for(int i = 0 ; 
-			i <  std::min(msfile->dataSize  , (unsigned int)((msfile->partN+1)*sizeof(FileMs::data))) -msfile->partN*sizeof(FileMs::data);
+			i <  std::min(fileS  , (unsigned int)((msfile->partN+1)*sizeof(FileMs::data))) -msfile->partN*sizeof(FileMs::data);
 			i++,ptr++){
 			mlc[ptr] = msfile->data[i];
 		}
@@ -165,6 +165,7 @@ void server::FileHandler(){
 		}
 		ptr=0;
 		fileNS=0;
+		fileS=0;
 		file.close();
 		return;
 	}

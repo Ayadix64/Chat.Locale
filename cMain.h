@@ -129,7 +129,6 @@ public:
 	void OnIpMan(wxCommandEvent& evt);
 	wxDECLARE_EVENT_TABLE();
 
-	void OnButtonClicked(wxCommandEvent& evnt);
 };
 
 

@@ -3,15 +3,17 @@
 #include "networking.hpp"
 #include "server.hpp"
 #include "client.hpp"
+#include <algorithm>
 #include <asio/executor_work_guard.hpp>
 #include <asio/io_context.hpp>
 #include <asio/ip/tcp.hpp>
 #include <asio/post.hpp>
+#include <ctime>
 #include <iostream>
 #include <string>
 #include <thread>
 std::vector<std::shared_ptr<connection>> cone;
-std::vector<std::shared_ptr<DevInNetwork>> dess;
+//std::vector<DevInNetwork> dess;
 
 std::atomic<unsigned long> server_count;
 
@@ -40,14 +42,17 @@ DevInNetwork::~DevInNetwork(){
 void DevInNetwork::connect(){
 
 	//asio::post(*io,[&](){
-	skt->async_connect(endp,[&](auto){
+	skt->async_connect(endp,[&](auto ec){
 		is_open=false;
 		//name=false;
 
 		ping->Mgic = MAGIC;
 		ping->TYPE = PING;
 		//logMsgs(endp.address().to_string(), "");
-		if(skt->is_open()){
+		if(ec){
+			delete this;
+		}
+		else if(skt->is_open()){
 			//IsTargitRuning(*skt);
 			skt->async_write_some(buffer((char*)ping,PACKAT),[&](std::error_code ec , size_t lg){
 				if(!ec){
@@ -62,7 +67,9 @@ void DevInNetwork::connect(){
 							logMsgs("FIND", name);
 							FindHandler();
 							closeSocket(*skt);
+							delete this;
 						}
+
 					});
 				}
 			});
@@ -125,9 +132,9 @@ unsigned int addConection(ip::tcp::socket &skt, io_context &io){
 
 void addServer(ip::tcp::socket &skt, io_context &io ){
 	unsigned int c = addConection(skt , io);
-	//std::shared_ptr<server> svr = std::make_shared<server>(skt , cone[c],io , servers , servers.size());
-	//unsigned int emP = servers.size();
-	server* svr = new server(skt , cone[c],io );
+	
+	new server(skt , cone[c],io );
+	
 	return ;
 }
 
@@ -187,7 +194,6 @@ void dicover(io_context &io , std::string Astart , std::string Aend ){
 			logMsgsErr("netdiscovering end is less than netdicovring start");
 			return;
 		}
-		dess.reserve(end-start);
 
 		for(int i = start  ; i <  end ; i++){
 			endp.address(ip::make_address_v4(i));
@@ -195,8 +201,9 @@ void dicover(io_context &io , std::string Astart , std::string Aend ){
 			try{
 				//std::shared_ptr<DevInNetwork> d = std::make_shared<DevInNetwork>(io,endp);
 				//dess.push_back(d);
-				dess.emplace_back(std::make_shared<DevInNetwork>(io,endp));//never make the chorno angree,i main, if he see this code, i dont think that this will make any change
+				//dess.emplace_back(std::make_shared<DevInNetwork>(io,endp));//never make the chorno angree,i main, if he see this code, i dont think that this will make any change
 
+				new DevInNetwork(io,endp);
 			}catch(std::system_error ec){
 				//probaly main that we cant connect to
 			}
@@ -250,7 +257,7 @@ asio::ip::tcp::acceptor* acceptor = NULL;
 
 std::thread serverThread;
 
-
+std::atomic<unsigned int> threadsAreOn = 0;
 
 void networking_init(){
 	updateLogs();
@@ -260,32 +267,37 @@ void networking_init(){
 	
 	acceptor = new ip::tcp::acceptor(*serverContext,asio::ip::tcp::endpoint(asio::ip::tcp::v4() , LISNT_PORT));//accept conections
 	
+	const unsigned int threadsC = std::thread::hardware_concurrency();
+	threadsAreOn=std::max(threadsC,(unsigned int)2);	
+	
+
 	serverThread = std::thread([&](){
 		auto w1 = make_work_guard(*serverContext);
 		logMsgs("SERVER THREAD STARTED");
 		serverContext->run();
+		threadsAreOn--;
 		logMsgs("SERVER THREAD CLOSED");
 		return ;
 	});
-	const unsigned int threadsC = std::thread::hardware_concurrency();
-	
 	
 
 	if(threadsC>1){
 		for(unsigned int i = 0 ; i < threadsC-1 ; i++ ){
-			std::thread([=](){
+			std::thread([&](){
 				logMsgs("MAIN_CONTEXT THREAD #"+std::to_string(i) + " --> OPEN");
 				auto w2 = make_work_guard(*mainContext);
 				mainContext->run();
+				threadsAreOn--;
 				logMsgs("MAIN_CONTEXT THREAD #"+std::to_string(i) + " --> CLOSE");
 				return;
 			}).detach();
 		}
 	}else {
 		std::thread([&](){
-				auto w2 = make_work_guard(*mainContext);
-				mainContext->run();
-				return ;
+			auto w2 = make_work_guard(*mainContext);
+			mainContext->run();
+			threadsAreOn--;
+			return ;
 		}).detach();
 	}
 	ClientHandl(acceptor, mainContext);
@@ -296,20 +308,25 @@ void networking_init(){
 }
 
 void networking_stop(){
-	dess.clear();
+	if(acceptor->is_open()){
+		acceptor->close();
+	}
 	for(int i = 0 ; i < cone.size() ; i++){
 		cone[i]->sendClose();
 	}
 	cone.clear();	
 	serverContext->stop();
-	mainContext->stop();
-	if(acceptor->is_open()){
-		acceptor->close();
-	}
+	
 	if(serverThread.joinable()){
 		serverThread.join();
 	}
-	
+
+	mainContext->stop();
+
+	unsigned int start_waiting = clock()/(CLOCKS_PER_SEC*1000);
+	const unsigned int timesup = 1000;
+	while (threadsAreOn && (clock()/(CLOCKS_PER_SEC*1000) - start_waiting) < timesup) {}	
+
 	delete serverContext;
 	delete mainContext;
 	delete acceptor;
