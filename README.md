@@ -5,14 +5,14 @@ A cross-platform multi-threading peer-to-peer chatting app programmed in C++
 
 This app is still in alpha, also known as prototype, and is not stable
 
-###It uses:
+### It uses:
 - ASIO as the network library
 - wxWidgets as the GUI library
 - OpenCV for camera capturing
 - PortAudio for audio capturing
 - LZ4 as a comprising methode for camera sending
 
-###It can:
+### It can:
 - Share camera video/audio
 - Send messages
 - Send files
