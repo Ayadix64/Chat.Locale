@@ -10,7 +10,7 @@ It uses:
 - wxWidgets as the GUI library
 - OpenCV for camera capturing
 - PortAudio for audio capturing
-
+- LZ4 as a comprising methode for camera sending
 It can:
 - Share camera video/audio
 - Send messages
@@ -77,6 +77,6 @@ mkdir build
 cd build
 cmake ..
 make
-#make -j who have multi threading systems
+#make -j to who have multi threading systems
 ```
 And you will have a *main* file in your folder to go.
