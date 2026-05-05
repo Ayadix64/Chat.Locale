@@ -22,7 +22,7 @@
 #include <system_error>
 #include <thread>
 #include <unistd.h>
-
+#include <lz4.h>
 
 
 std::function<void(Image &img,unsigned int ID)> imageHandlingReq = [](auto,auto){return;};
@@ -106,10 +106,6 @@ void server::pingHandler(){
 	return;
 }
 void server::FileHandler(){
-
-//TODO: in this fenction, if the sender change the file size, it will be cuse a dangerus buffer overfluw,
-//so ; stor the dataSize in a variabel in the class
-
 	FileMs * msfile = (FileMs*)data->data;
 	if(!msfile->partN){
 
@@ -194,7 +190,7 @@ void server::FileHandler(){
 void server::ImageHandler(){
 	ImageMs * msImg = (ImageMs*)data->data;
 	if(!msImg->packN){
-		ISize = msImg->ImgWidht * msImg->ImgHight * 3;
+		ISize = msImg->DataSize;
 		ImgB = (char*) malloc(ISize);
 		imageWidth=msImg->ImgWidht;
 		imageHeight=msImg->ImgHight;
@@ -215,12 +211,13 @@ void server::ImageHandler(){
 	}
 	if(Iptr >= ISize){
 	
-			Image img;
-			img.ImgHight = this->imageHeight;
-			img.ImgWidht = this->imageWidth;
-			img.imgBitmap = this->ImgB;
-
-			imageHandlingReq(img,conction->ID);
+		Image img;
+		img.ImgHight = this->imageHeight;
+		img.ImgWidht = this->imageWidth;
+		img.imgBitmap = (char*)malloc(this->imageWidth*this->imageHeight*3);
+		LZ4_decompress_safe(ImgB, img.imgBitmap, ISize, this->imageHeight*this->imageWidth*3);	
+		imageHandlingReq(img,conction->ID);
+		FREE(img.imgBitmap)
 		
 		if(ImgB!=nullptr){
 			FREE(ImgB);

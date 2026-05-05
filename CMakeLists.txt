@@ -11,6 +11,9 @@ find_package(wxWidgets REQUIRED)
 find_package(PkgConfig REQUIRED)
 find_package(X11 REQUIRED)
 
+
+
+pkg_check_modules(lz4 REQUIRED IMPORTED_TARGET liblz4)
 pkg_check_modules(PORTAUDIO REQUIRED portaudio-2.0)
 
 include_directories( ${OpenCV_INCLUDE_DIRS})
@@ -22,4 +25,4 @@ include(UsewxWidgets)
 
 add_executable(main main.cpp cApp.cpp cMain.cpp networking.cpp client.cpp server.cpp config.cpp login.cpp camera.cpp soundIO.cpp screenCapturing.cpp)
 #target_link_libraries(main Qt6::Widgets)
-target_link_libraries( main ${OpenCV_LIBS} ${wxWidgets_LIBRARIES} ${PORTAUDIO_LIBRARIES} X11::X11)
+target_link_libraries( main ${OpenCV_LIBS} ${wxWidgets_LIBRARIES} ${PORTAUDIO_LIBRARIES} X11::X11 PkgConfig::lz4)

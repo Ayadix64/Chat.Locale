@@ -1,5 +1,6 @@
 #include "client.hpp"
 #include "networking.hpp"
+#include <lz4.h>
 connection::connection (asio::ip::tcp::endpoint endp , io_context &io ,std::vector <std::shared_ptr<connection>>& coneBuf)
 {
 	this->io = &io;
@@ -152,13 +153,15 @@ void connection::sendImage(unsigned int hight , unsigned int width , unsigned ch
 	bool cont = false;
 	if(m_close)return;
 		unsigned int hi = hight, wi= width;
-		unsigned int Size = hi*wi*3;//R8G8B8
-
-
-		char* imgData = (char*)malloc(Size);	
-		memcpy(imgData, iData, Size);	
 		
+		unsigned int Size = LZ4_compressBound(hi*wi*3);//R8G8B8
 
+
+		char* imgData = (char*)malloc(Size);
+		//memcpy(imgData, iData, Size);	
+		
+		Size = LZ4_compress_default((const char*)iData, (char*)imgData, (int)hi*wi*3, (int)Size);
+		
 		cont=true;
 		error_code ec;
 		ip::tcp::socket sk(*io);
@@ -179,7 +182,9 @@ void connection::sendImage(unsigned int hight , unsigned int width , unsigned ch
 		
 		memset(&ms , 0, sizeof(ms ));
 		memset(&ims, 0, sizeof(ims));
-			
+		
+
+
 		unsigned int packsNeed = (Size + sizeof(ims.data) -1)/sizeof(ims.data);
 		ms.msgL = Size + packsNeed * (sizeof(ms) - sizeof(ims.data));
 
@@ -188,15 +193,17 @@ void connection::sendImage(unsigned int hight , unsigned int width , unsigned ch
 		
 		ims.ImgHight=hi;
 		ims.ImgWidht=wi;
+		ims.DataSize=Size;
 		ims.packN = 0;	
 
 		unsigned int dataWroten = 0;
 		
 		Packat ready{.TYPE=READY,.Mgic=MAGIC,.msgL=0};
-		//if(imgData==nullptr)return;	
+		//if(imgData==nullptr)return;
 		memcpy(ims.data, imgData, std::min(Size,(unsigned int)sizeof(ims.data)));
 		dataWroten+=	std::min(Size,(unsigned int)sizeof(ims.data));
 		memcpy(ms.data, &ims, std::min(sizeof(ms.data) , sizeof(ims)));
+		
 		bool ret = false;
 		sk.write_some(buffer(&ms,PACKAT) , ec);
 		if(ec){

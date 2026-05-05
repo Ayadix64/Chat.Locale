@@ -28,18 +28,26 @@ std::atomic<bool> ThreadsSholdExit = false;
 bool CameraHaveBeenChanged = false;
 unsigned int CameraNumber = 0;
 
+std::atomic<bool> HaveToSendeImage=false;
 
 unsigned char* data = NULL;
-unsigned int h = 0 , w = 0;
+std::atomic<unsigned int> h = 0 , w = 0;
 
 cv::VideoCapture cam;
 
 void SendingThreadFn(){
 	while(!ThreadsSholdExit){
-		if(data!=NULL){
+		if(data!=NULL && HaveToSendeImage){
 			cameraCapturingReq(w,h,data);
+			HaveToSendeImage=false;
 		}
 	}
+	/* why we put a sending thread seperet frome a recording thread?            *
+	 * you see , when it sends to a mulitpule devices in the network , we       *
+	 * expect a deley of sending, wich sends the old frame for evry device      *
+	 * wich may , in a defrent condetions makes a sound deley frome the image   *
+	 * so, this , even thig of the machine is not capebele of sending at hiegth *
+	 * frame rate, we will have the most acurute frame.                         */
 	return;
 }
 
@@ -68,6 +76,7 @@ void CapturingThrFn(){
 			}
 			if(data!=NULL){
 				memcpy(data, frame.data, h*w*3);
+				HaveToSendeImage=true;
 			}
 
 		}
@@ -77,6 +86,7 @@ void CapturingThrFn(){
 
 void CameraStart(){
 	cam.open(CameraNumber);
+	
 	if(cam.isOpened()){
 		CameraHaveBeenChanged=true;
 		ThreadsSholdExit=false;

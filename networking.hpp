@@ -95,8 +95,8 @@ struct ImageMs {//it livs in Message::MES
 		unsigned int packN     = 0       ;
 		unsigned int ImgWidht  = 0       ;
 		unsigned int ImgHight  = 0       ;
-
-		char data [PACKAT-PACK_HS-12]    ;
+		unsigned int DataSize  = 0       ;//becuse it will be compresed and decompresed
+		char data [PACKAT-PACK_HS-16]    ;
 }__attribute__((packed)) ;
 
 

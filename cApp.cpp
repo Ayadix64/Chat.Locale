@@ -27,9 +27,7 @@ bool cApp::OnInit(){
 	}else{
 		
 		updateLogs();
-		/*std::thread([=](){		
-			dicover(*mainContext, networkDiscoverBase, networkDiscoverEnd);
-		}).detach();*/
+
 		soundIOInit();
 		CameraStart();	
 		frame1 = new cMain();
