@@ -107,7 +107,7 @@ void connection::sendFile(std::string fileP)
 		sk.write_some(buffer(&ms,PACKAT) , ec );
 		if(ec){
 			logMsgs("ERROR SENDING FILE", ec.message());
-			//closeSocket(sk);
+			closeSocket(sk);
 			FREE(mlc);
 			return ;
 		}
@@ -126,8 +126,6 @@ void connection::sendFile(std::string fileP)
 			memcpy(ms.data, &fms, std::min(sizeof(ms.data) , sizeof(fms)));
 			
 			//logMsgs("WAITING", std::to_string(writ));
-			sk.wait(sk.wait_read);
-			sk.read_some(buffer(&ready,PACKAT));
 			sk.write_some(buffer(&ms,PACKAT));
 			dataWroten+=writ;
 			if(ec){

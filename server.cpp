@@ -152,7 +152,7 @@ void server::FileHandler(){
 		//logMsgs("WRITING FILE ...", "");
 		file.seekp(0);
 		file.write(mlc, ptr);
-		fileHandlerRequastComplite(fileName,fileNS,this->conction->getID());		
+		fileHandlerRequastComplite(fileName,fileS,this->conction->getID());		
 		
 		fileName="";
 		if(mlc!=nullptr){
@@ -166,20 +166,6 @@ void server::FileHandler(){
 		return;
 	}
 
-	else{//sending ready
-		Packat ready{
-			.TYPE=READY,
-			.Mgic=MAGIC,
-			.msgL=0
-		};
-		error_code e;
-		skt->write_some(buffer(&ready ,PACK_HS /*it is just a ready , no data,to simlify things, we dont want multi packats*/),e );
-		if(e){
-			logMsgs("ERROR IN SENDING READY", e.message());
-		}else{
-			skt->wait(skt->wait_write);
-		}
-	}
 	return;
 
 
