@@ -76,5 +76,7 @@ cd Chat.Locale
 mkdir build
 cd build
 cmake ..
+make
+#make -j who have multi threading systems
 ```
 And you will have a *main* file in your folder to go.
