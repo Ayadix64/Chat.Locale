@@ -12,9 +12,13 @@
 #include "soundIO.hpp"
 #include "camera.hpp"
 cApp::cApp(){
+
 }
 
 cApp::~cApp(){
+	soundIOStop();
+	CameraStop();
+	networking_stop();
 	logMsgs("CLOSING");
 	return;
 }
@@ -27,7 +31,6 @@ bool cApp::OnInit(){
 	}else{
 		
 		updateLogs();
-
 		soundIOInit();
 		CameraStart();	
 		frame1 = new cMain();

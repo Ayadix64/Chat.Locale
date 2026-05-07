@@ -29,8 +29,8 @@ PaStreamParameters outputParm;
 PaStreamParameters fakeIPar;
 
 float* g_soundRecorded = nullptr;
-bool g_soundHaveBeenRecorde = false;
-bool g_soundThreadSholdStop = false;
+std::atomic<bool> g_soundHaveBeenRecorde= false;
+std::atomic<bool> g_soundThreadSholdStop = false;
 
 std::thread g_ReacordingThread;
 
@@ -131,6 +131,7 @@ void soundIOStop(){
 	}
 	
 	PAErr(Pa_Terminate());
+	logMsgs("SOUND IO CLOSED");
 }
 
 

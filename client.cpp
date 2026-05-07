@@ -373,12 +373,10 @@ void connection::Close(){
 	unsigned int pos = getVecPos();
 	if(pos!=-1){
 		m_close=true;
-		io->stop();
 		conectionBuf->erase(conectionBuf->begin() + pos);
 	}else{
 		logMsgsErr("CONCTION OBJECT , nevr found his selfe :(");
 	}
-	io->stop();
 	return;
 }
 

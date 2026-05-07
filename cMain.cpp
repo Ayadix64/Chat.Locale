@@ -262,7 +262,7 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 
 	Bind(wxEVT_TIMER,[&](wxEvent &e){
 
-		for( ; ConectionsNumber<cone.size() ; ConectionsNumber++){
+		for( ; ConectionsNumber<cone.size()  ; ConectionsNumber++){
 
 
 				bt= new wxButton(buttons,START_DEV_BUT_ID+ConectionsNumber,(wxString)cone[ConectionsNumber]->name , wxDefaultPosition , wxDefaultSize);
@@ -380,14 +380,11 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 
 
 cMain::~cMain(){
-	soundIOStop();
-	CameraStop();
 	if(timer){
 		timer->Stop();
 	}
-	/*this->stopCapturing=true;
-	this->StopFinding = true;
-	this->allowSoundRecording=false;*/
+	soundIOStop();
+	CameraStop();
 	networking_stop();
 	return;
 }

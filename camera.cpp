@@ -48,6 +48,7 @@ void SendingThreadFn(){
 	 * wich may , in a defrent condetions makes a sound deley frome the image   *
 	 * so, this , even thig of the machine is not capebele of sending at hiegth *
 	 * frame rate, we will have the most acurute frame.                         */
+	logMsgs("CAMERA SENDING THREAD","CLOSE");
 	return;
 }
 
@@ -81,6 +82,7 @@ void CapturingThrFn(){
 
 		}
 	}
+	logMsgs("CAMERA CAPTURING THREAD","CLOSE");
 
 }
 

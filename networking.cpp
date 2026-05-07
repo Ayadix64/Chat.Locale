@@ -8,10 +8,14 @@
 #include <asio/io_context.hpp>
 #include <asio/ip/tcp.hpp>
 #include <asio/post.hpp>
+#include <cstdlib>
 #include <ctime>
 #include <iostream>
 #include <string>
+#include <system_error>
 #include <thread>
+#include <unistd.h>
+#include <vector>
 std::vector<std::shared_ptr<connection>> cone;
 //std::vector<DevInNetwork> dess;
 
@@ -33,9 +37,7 @@ DevInNetwork::DevInNetwork(asio::io_context & io , ip::tcp::endpoint& ep)
 
 DevInNetwork::~DevInNetwork(){
 	FREE(ping);
-	if(skt->is_open()){
-		closeSocket(*skt);
-	}
+	
 	delete skt;
 }
 
@@ -51,6 +53,7 @@ void DevInNetwork::connect(){
 		//logMsgs(endp.address().to_string(), "");
 		if(ec){
 			delete this;
+			return;
 		}
 		else if(skt->is_open()){
 			//IsTargitRuning(*skt);
@@ -74,6 +77,8 @@ void DevInNetwork::connect(){
 				}
 			});
 
+		}else {
+			return ;
 		}
 
 	});
@@ -82,6 +87,8 @@ void DevInNetwork::connect(){
 void DevInNetwork::FindHandler(){
 	unsigned int con = addConection(endp,*io);
 	cone[con]->name = this->name;
+	cone[con]->sendPong();
+	return;
 }
 
 
@@ -131,7 +138,7 @@ unsigned int addConection(ip::tcp::socket &skt, io_context &io){
 }
 
 void addServer(ip::tcp::socket &skt, io_context &io ){
-	unsigned int c = addConection(skt , io);
+	unsigned int c = addConection(skt.remote_endpoint() , io);
 	
 	new server(skt , cone[c],io );
 	
@@ -144,7 +151,7 @@ void ClientHandl(asio::ip::tcp::acceptor *accept , io_context* io){
 			[=](std::error_code ec , asio::ip::tcp::socket socket)
 			{
 				if(!ec){
-					std::cout<<"Cleint connect! @" << server_count << "\n";
+					//std::cout<<"Cleint connect! @" << server_count << "\n";
 					addServer(socket,*io); 
 
 
@@ -259,6 +266,9 @@ std::thread serverThread;
 
 std::atomic<unsigned int> threadsAreOn = 0;
 
+std::vector<std::thread> networkingthreads;
+
+
 void networking_init(){
 	updateLogs();
 	serverContext=new io_context();
@@ -268,8 +278,11 @@ void networking_init(){
 	acceptor = new ip::tcp::acceptor(*serverContext,asio::ip::tcp::endpoint(asio::ip::tcp::v4() , LISNT_PORT));//accept conections
 	
 	const unsigned int threadsC = std::thread::hardware_concurrency();
+	
 	threadsAreOn=std::max(threadsC,(unsigned int)2);	
 	
+	networkingthreads.resize(std::abs((int)(threadsC-1)));
+
 
 	serverThread = std::thread([&](){
 		auto w1 = make_work_guard(*serverContext);
@@ -283,14 +296,16 @@ void networking_init(){
 
 	if(threadsC>1){
 		for(unsigned int i = 0 ; i < threadsC-1 ; i++ ){
-			std::thread([&](){
-				logMsgs("MAIN_CONTEXT THREAD #"+std::to_string(i) + " --> OPEN");
-				auto w2 = make_work_guard(*mainContext);
-				mainContext->run();
-				threadsAreOn--;
-				logMsgs("MAIN_CONTEXT THREAD #"+std::to_string(i) + " --> CLOSE");
-				return;
-			}).detach();
+			networkingthreads.push_back(
+				std::thread([&,i](){
+					logMsgs("MAIN_CONTEXT THREAD #"+std::to_string(i) + " --> OPEN");
+					auto w2 = make_work_guard(*mainContext);
+					mainContext->run();
+					threadsAreOn--;
+					logMsgs("MAIN_CONTEXT THREAD #"+std::to_string(i) + " --> CLOSE");
+					return;
+					})
+				);
 		}
 	}else {
 		std::thread([&](){
@@ -308,14 +323,18 @@ void networking_init(){
 }
 
 void networking_stop(){
+	logMsgs("CLOSING NETWORKING");
 	if(acceptor->is_open()){
-		acceptor->close();
+		std::error_code ec;
+		acceptor->close(ec);
+		if(ec){
+			logMsgsErr("CANT CLOSE ACCEPTOR");
+		}
 	}
+	serverContext->stop();
 	for(int i = 0 ; i < cone.size() ; i++){
 		cone[i]->sendClose();
 	}
-	cone.clear();	
-	serverContext->stop();
 	
 	if(serverThread.joinable()){
 		serverThread.join();
@@ -323,12 +342,24 @@ void networking_stop(){
 
 	mainContext->stop();
 
+	for(int i = 0 ; i < networkingthreads.size() ; i++){
+		if(networkingthreads[i].joinable()){
+			networkingthreads[i].join();
+		}
+	}
+	networkingthreads.clear();
+	/*if(cone.size()){
+		for(int i =  cone.size()-1 ; i >=0 ; i--){
+			cone[i]->Close();
+			
+		}
+	}*/
 	unsigned int start_waiting = clock()/(CLOCKS_PER_SEC*1000);
 	const unsigned int timesup = 1000;
-	while (threadsAreOn && (clock()/(CLOCKS_PER_SEC*1000) - start_waiting) < timesup) {}	
-
+	while (threadsAreOn && (clock()/(CLOCKS_PER_SEC*1000) - start_waiting) < timesup) {std::cout<<".";}
+	logMsgs("NETWORKING CLOSED");
+	delete acceptor;
 	delete serverContext;
 	delete mainContext;
-	delete acceptor;
 	return;
 }
