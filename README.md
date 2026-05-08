@@ -13,15 +13,19 @@ This app is still in alpha, also known as prototype, and is not stable
 - LZ4 as a comprising methode for camera sending
 
 ### It can:
-- Share camera video/audio
-- Send messages
+- video/audio chating
+- Send text messages
 - Send files
 
-*AND no server between them, your device is a server and a client at the same time*
+### Futurs
+- end to end messaging
+- runs localy at your machine
+- image lz4 comprassing
+- cross platform (linux/macos/bsd's/windows)
+- multi threading uses
 
-The code itself is experimental, but I'm still developing it to make it as stable as possible
 
-To be honest, what do you think? I speed-ran making it for a competition, and it is probably the worst code that I've ever made
+The code itself is in **ALPHA** stage, but I'm still developing it to make it as stable as possible
 
 ## Installing
 - First of all, download the source file. For sure, you will have source and download zip up there
