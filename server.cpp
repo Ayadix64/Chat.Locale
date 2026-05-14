@@ -23,6 +23,7 @@
 #include <thread>
 #include <unistd.h>
 #include <lz4.h>
+#include <zstd.h>
 
 
 std::function<void(Image &img,unsigned int ID)> imageHandlingReq = [](auto,auto){return;};
@@ -201,7 +202,8 @@ void server::ImageHandler(){
 		img.ImgHight = this->imageHeight;
 		img.ImgWidht = this->imageWidth;
 		img.imgBitmap = (char*)malloc(this->imageWidth*this->imageHeight*3);
-		LZ4_decompress_safe(ImgB, img.imgBitmap, ISize, this->imageHeight*this->imageWidth*3);	
+		//LZ4_decompress_safe(ImgB, img.imgBitmap, ISize, this->imageHeight*this->imageWidth*3);	
+		ZSTD_decompress(img.imgBitmap, this->imageHeight*this->imageWidth*3, this->ImgB, this->ISize);
 		imageHandlingReq(img,conction->ID);
 		FREE(img.imgBitmap)
 		

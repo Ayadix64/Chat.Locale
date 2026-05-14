@@ -77,10 +77,12 @@ static int paCallBackOutSound(const void* inBuf , void* outBuf , unsigned long f
 {
 	float* out = (float*)outBuf;
 	for(int i = 0 ; i < framesPerBuf*2; i++){
+		static float lastVul = 0.0; 
 		if(i < dataToPlay.size()){
 			out[i]=dataToPlay[i];
+			lastVul = out[i];
 		}else {
-			out[i]=0.0;
+			out[i]=lastVul;
 		}
 	}
 	if(framesPerBuf*2 >= dataToPlay.size()){

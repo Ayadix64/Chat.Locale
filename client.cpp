@@ -1,17 +1,14 @@
 #include "client.hpp"
 #include "networking.hpp"
 #include <lz4.h>
+#include <zstd.h>
+
 connection::connection (asio::ip::tcp::endpoint endp , io_context &io ,std::vector <std::shared_ptr<connection>>& coneBuf)
 {
 	this->io = &io;
-	
 	this->adress = endp.address();
-	
 	this->conectionBuf = &coneBuf;
-	
 	this->ID=getUsebelID();
-	
-	
 	return;
 
 }
@@ -26,7 +23,6 @@ connection::connection(ip::tcp::socket& skt , io_context &io , std::vector <std:
 	this->conectionBuf = &coneBuf;
 	this->ID=getUsebelID();
 }	
-	
 
 
 connection::~connection(){
@@ -152,14 +148,13 @@ void connection::sendImage(unsigned int hight , unsigned int width , unsigned ch
 	if(m_close)return;
 		unsigned int hi = hight, wi= width;
 		
-		unsigned int Size = LZ4_compressBound(hi*wi*3);//R8G8B8
+		unsigned int Size = ZSTD_compressBound(hi*wi*3); ;//LZ4_compressBound(hi*wi*3);//R8G8B8
 
 
 		char* imgData = (char*)malloc(Size);
 		//memcpy(imgData, iData, Size);	
 		
-		Size = LZ4_compress_default((const char*)iData, (char*)imgData, (int)hi*wi*3, (int)Size);
-		
+		Size = ZSTD_compress(imgData, Size, iData, hi*wi*3, 1) ;//LZ4_compress_default((const char*)iData, (char*)imgData, (int)hi*wi*3, (int)Size);
 		cont=true;
 		error_code ec;
 		ip::tcp::socket sk(*io);

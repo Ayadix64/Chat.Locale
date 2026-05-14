@@ -126,3 +126,35 @@ int writeConf(std::string file , std::string conf , std::string valu){
 }
 
 
+bool IsTherConfig(std::string file, std::string conf){
+	std::ifstream ifile(file);
+	std::string str;
+	if(ifile.is_open()){
+		for ( int i = 0 ; std::getline(ifile,str) ; i++) {
+			if(!str.size())continue;
+			
+			int semi = str.find(":");
+			int hash = str.find("#");
+			int textStart = 0;
+			int textEnd =  0;
+			int startOfline = 0;
+			
+			for(; (str[startOfline] == ' ' || str[startOfline] =='\t') && startOfline<str.size();startOfline++);;
+				
+			if(startOfline == str.size())continue;
+			if(semi == -1)continue;
+			if(hash != -1 && hash < semi )continue;
+			
+			std::string co = str.substr(startOfline,semi);	
+			if(co==conf){return true;}
+		}
+
+		ifile.close();
+		return false;
+	}else {
+		std::cout << "\n[ERROR]: never finde config file \""<<file <<".";
+		return false;
+	}
+	return false;
+}
+

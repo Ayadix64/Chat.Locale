@@ -7,6 +7,10 @@
 #include <asio/ts/buffer.hpp>
 #include <asio/ts/internet.hpp>
 
+#define WINDOW_WIDTH_CONFIG  "window_w"
+#define WINDOW_HEIGTH_CONFIG "window_h"
+
+
 
 #define FREE(x)\
 	if(x==NULL){\
@@ -41,4 +45,9 @@ static void resetConsolCl(){
 	std::cout<<"\x1B[0m\n";
 	return;
 }
+
+typedef  struct {unsigned int x=0, y=0;} Vec2ui;
+
+
+
 #endif
