@@ -20,7 +20,7 @@ This app is still in alpha, also known as prototype, and is not stable
 ### Futurs
 - end to end messaging
 - runs localy at your machine
-- image lz4 comprassing
+- audio/image lz4 comprassing
 - cross platform (linux/macos/bsd's/windows)
 - multi threading uses
 
