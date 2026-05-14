@@ -103,8 +103,8 @@ struct ImageMs {//it livs in Message::MES
 struct SoundMs {//it livs in Message::MES
 		unsigned int packN     = 0         ;
 		unsigned int Size      = 0         ;//this one is float , so size*sizeof(float) , iow : devide the size to 4
-
-		float data [(PACKAT-PACK_HS-8)/4]  ;
+		unsigned int OSize     = 0         ;//original uncompreseed data size
+		unsigned char data [(PACKAT-PACK_HS-8)]  ;
 }__attribute__((packed)) ;
 
 

@@ -148,13 +148,13 @@ void connection::sendImage(unsigned int hight , unsigned int width , unsigned ch
 	if(m_close)return;
 		unsigned int hi = hight, wi= width;
 		
-		unsigned int Size = ZSTD_compressBound(hi*wi*3); ;//LZ4_compressBound(hi*wi*3);//R8G8B8
+		unsigned int Size = LZ4_compressBound(hi*wi*3);//R8G8B8
 
 
 		char* imgData = (char*)malloc(Size);
 		//memcpy(imgData, iData, Size);	
 		
-		Size = ZSTD_compress(imgData, Size, iData, hi*wi*3, 1) ;//LZ4_compress_default((const char*)iData, (char*)imgData, (int)hi*wi*3, (int)Size);
+		Size = LZ4_compress_default((const char*)iData, (char*)imgData, (int)hi*wi*3, (int)Size);
 		cont=true;
 		error_code ec;
 		ip::tcp::socket sk(*io);
@@ -246,9 +246,10 @@ void connection::sendImage(unsigned int hight , unsigned int width , unsigned ch
 void connection::sendSound(float* data__ , unsigned int ln){//NOTE:if somthing break , this is mybe the cuse
 	bool conti = false;
 		if(m_close)return;
-		unsigned int Size = ln*4;
-		float* data = (float*)malloc(Size);	
-		memcpy(data, data__, Size);
+		unsigned int Size = LZ4_compressBound(ln*4);
+		float* data = (float*)malloc(Size);
+		//memcpy(data, data__, Size);
+		Size=LZ4_compress_default((const char*)data__, (char*)data, ln*4, Size);
 		conti = true;	
 			
 		error_code ec;
@@ -278,10 +279,10 @@ void connection::sendSound(float* data__ , unsigned int ln){//NOTE:if somthing b
 		
 		sms.Size = Size;
 		sms.packN = 0;	
-
+		sms.OSize=ln*4;
+		
 		unsigned int dataWroten = 0;
 		
-		Packat ready{.TYPE=READY,.Mgic=MAGIC,.msgL=0};
 		if(data==nullptr)return;	
 		memcpy(sms.data, data, std::min(Size,(unsigned int)sizeof(sms.data)));
 		dataWroten+=	std::min(Size,(unsigned int)sizeof(sms.data));
@@ -309,7 +310,6 @@ void connection::sendSound(float* data__ , unsigned int ln){//NOTE:if somthing b
 			memcpy(sms.data, (char*)(data+dataWroten), writ);
 			memcpy(ms.data, &sms, std::min(sizeof(ms.data) , sizeof(sms)));
 			
-			ready.TYPE=0;
 			
 			sk.write_some(buffer(&ms,PACKAT),ec);
 			

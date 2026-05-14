@@ -202,8 +202,8 @@ void server::ImageHandler(){
 		img.ImgHight = this->imageHeight;
 		img.ImgWidht = this->imageWidth;
 		img.imgBitmap = (char*)malloc(this->imageWidth*this->imageHeight*3);
-		//LZ4_decompress_safe(ImgB, img.imgBitmap, ISize, this->imageHeight*this->imageWidth*3);	
-		ZSTD_decompress(img.imgBitmap, this->imageHeight*this->imageWidth*3, this->ImgB, this->ISize);
+		LZ4_decompress_safe(ImgB, img.imgBitmap, std::min(ISize,this->imageHeight*this->imageWidth*3), this->imageHeight*this->imageWidth*3);	
+		//ZSTD_decompress(img.imgBitmap, this->imageHeight*this->imageWidth*3, this->ImgB, std::min(this->ISize,(unsigned int)ZSTD_compressBound(this->imageWidth*this->imageHeight*3)));
 		imageHandlingReq(img,conction->ID);
 		FREE(img.imgBitmap)
 		
@@ -223,10 +223,12 @@ void server::ImageHandler(){
 void server::SondeHandler(){
 	SoundMs * msSound = (SoundMs*)data->data;
 	if(!msSound->packN){
-		SSize = msSound->Size / 4;
-		SondB = (float*) malloc(SSize*4);
+		SSize = msSound->Size ;
+		if(SondB!=nullptr){FREE(SondB)}
+		SondB =(char*)malloc(SSize);
 		Sptr=0;
-		for(int i = 0 ; i < std::min((unsigned int)sizeof(SoundMs::data)/4 , SSize);i++,Sptr++){
+		OSSize=msSound->OSize;
+		for(int i = 0 ; i < std::min((unsigned int)sizeof(SoundMs::data) , SSize);i++,Sptr++){
 			SondB[Sptr] = msSound->data[Sptr];
 		}
 	}
@@ -234,20 +236,23 @@ void server::SondeHandler(){
 	else {
 		
 		for(int i = 0 ; 
-			i <  std::min( SSize, (unsigned int)( (msSound->packN+1)*sizeof(SoundMs::data)/4 ) ) - msSound->packN*sizeof(SoundMs::data)/4;
+			i <  std::min( SSize, (unsigned int)( (msSound->packN+1)*sizeof(SoundMs::data) ) ) - msSound->packN*sizeof(SoundMs::data);
 			i++,Sptr++){
 			SondB[Sptr] = msSound->data[i];
 		}
 		
 	}
 	if(Sptr >= SSize){
-	
-		soundHandlerRequast(SondB,SSize,conction->ID);
+		float* sbuff = (float*)malloc(OSSize);
+		LZ4_decompress_safe((const char*)SondB, (char*)sbuff, SSize, OSSize);
+		soundHandlerRequast(sbuff,OSSize/4,conction->ID);
+		FREE(sbuff);
 		if(SondB!=nullptr){
 			FREE(SondB);
 			SondB=nullptr;
 		}
 		SSize=0;
+		OSSize=0;
 		Sptr=0;
 
 	}

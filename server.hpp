@@ -34,12 +34,12 @@ public:
 	unsigned int imageWidth=0;//as it sounds
 	unsigned int imageHeight=0;
 
-	float* SondB =nullptr;//sound buffer
-	unsigned int Sptr;//sound buffer ptr
-	unsigned int SSize;//sound size
-	
+	char* SondB =nullptr;//sound buffer
+	unsigned int Sptr=0;//sound buffer ptr
+	unsigned int SSize=0;//sound size
+	unsigned int OSSize=0;//uncompresed sound size	
 	char* msgBuf=nullptr;
-	unsigned int msPtr  ;
+	unsigned int msPtr=0;
 	unsigned int msSize ;
 
 	io_context* io;	
