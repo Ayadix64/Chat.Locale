@@ -5,6 +5,7 @@
 
 connection::connection (asio::ip::tcp::endpoint endp , io_context &io ,std::vector <std::shared_ptr<connection>>& coneBuf)
 {
+	static unsigned long s_ids=0;
 	this->io = &io;
 	this->adress = endp.address();
 	this->conectionBuf = &coneBuf;
@@ -35,6 +36,8 @@ connection::~connection(){
 void connection::sendFile(std::string fileP)
 {
 	if(m_close)return;
+	
+	//TODO: remplace this with a one thread with a vectiry with structs or somthing
 	std::thread([=](){
 		std::filesystem::path fp(fileP);
 		std::ifstream ifl(fileP ,std::ios::in|std::ios::app|std::ios::ate);
@@ -121,7 +124,6 @@ void connection::sendFile(std::string fileP)
 			memcpy(fms.data, (char*)(mlc+dataWroten), writ);
 			memcpy(ms.data, &fms, std::min(sizeof(ms.data) , sizeof(fms)));
 			
-			//logMsgs("WAITING", std::to_string(writ));
 			sk.write_some(buffer(&ms,PACKAT));
 			dataWroten+=writ;
 			if(ec){
@@ -160,7 +162,6 @@ void connection::sendImage(unsigned int hight , unsigned int width , unsigned ch
 		ip::tcp::socket sk(*io);
 		sk.connect(ip::tcp::endpoint(this->adress, LISNT_PORT) , ec);
 		
-		//sk.connect(ip::tcp::endpoint(this->adress, LISNT_PORT),ec);
 		if(ec || !sk.is_open()){
 			logMsgs("ERROR SENDING IMAGE", ec.message());
 			if(imgData!=nullptr){
@@ -515,12 +516,15 @@ bool connection::is_open(){
 unsigned int connection::getID(){
 	return ID;
 }
-unsigned int connection::getUsebelID(){
-	unsigned int nID=0;
+unsigned long connection::getUsebelID(){
+	static unsigned long s_ids = 0;
+	return s_ids++;
+	/*unsigned int nID=0;
 	for(int i = 0 ; i < this->conectionBuf->size() ; i++){
 		if(this->conectionBuf->at(i)->ID == nID)nID++;
 	}
-	return nID;
+	return nID;*/
+
 }
 
 unsigned int connection::getVecPos(){

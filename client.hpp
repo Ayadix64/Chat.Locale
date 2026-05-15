@@ -21,10 +21,11 @@ class connection:
 	unsigned int serverOpnedFromeDestny = 0;
 
 	
-	unsigned int ID=0;
-	unsigned int getUsebelID();//this .. do what is sounds it do
+	unsigned long ID=0;
+	unsigned long getUsebelID();//this .. do what is sounds it do
 	unsigned int getVecPos(); 
 	bool m_close = false;
+
 public:
 	std::string name;
 	ip::address getAddress();

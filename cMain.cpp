@@ -1,5 +1,4 @@
 #include <asio/ip/address_v4.hpp>
-#include <cstddef>
 #include <cstring>
 
 #include <cstdio>
@@ -51,7 +50,6 @@
 #include <opencv2/opencv.hpp>
 
 #include "cMain.h"
-#include "config.hpp"
 #include "login.hpp"
 #include "soundIO.hpp"
 #include "utils.hpp"
@@ -63,8 +61,6 @@
 
 
 
-
-#include <vector>
 wxBEGIN_EVENT_TABLE(cMain, wxFrame)
 wxEND_EVENT_TABLE()
 
@@ -80,44 +76,7 @@ wxBitmap Mat2Bitmap(cv::Mat& frame){
 }
 
 
-#define WINDOW_DEFULT_W 1200
-#define WINDOW_DEFULT_H 800
-#define WINDOW_MIN_W 640
-#define WINDOW_MIN_H 480
-Vec2ui GetWindowSize(){
-	Vec2ui wh = {WINDOW_DEFULT_W,WINDOW_DEFULT_H};
-	
-	std::string w_str;
-	
-	if(readConf(USER_CONFIG, WINDOW_WIDTH_CONFIG , w_str)){
-		unsigned int width = std::stoi(w_str);
-		if(width<WINDOW_MIN_W){
-			logMsgs("WINDOW SIZE SMALLEST THAN THE MINMUL SIZE");
-			width=WINDOW_MIN_W;
-		}else {
-			wh.x=width;
-		}
-		
-	}
-
-	
-	std::string h_str;
-	
-	if(readConf(USER_CONFIG, WINDOW_HEIGTH_CONFIG , h_str)){
-		unsigned int heigth = std::stoi(h_str);
-		if(heigth<WINDOW_MIN_H){
-			logMsgs("WINDOW SIZE SMALLEST THAN THE MINMUL SIZE");
-			heigth=WINDOW_MIN_H;
-		}else {
-			wh.y=heigth;
-		}
-		
-	}
-	return wh;
-}
-
-
-cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , wxSize(GetWindowSize().x,GetWindowSize().y)){
+cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , wxSize(1200,800)){
 
 	satingswindow = new Satings(satingsOpen);
 	//Menus***********************************************************************
@@ -303,7 +262,7 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 
 	Bind(wxEVT_TIMER,[&](wxEvent &e){
 
-		for( ; ConectionsNumber<cone.size()  ; ConectionsNumber++){
+		for( ; ConectionsNumber<cone.size() ; ConectionsNumber++){
 
 
 				bt= new wxButton(buttons,START_DEV_BUT_ID+ConectionsNumber,(wxString)cone[ConectionsNumber]->name , wxDefaultPosition , wxDefaultSize);

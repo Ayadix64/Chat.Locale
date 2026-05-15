@@ -85,3 +85,13 @@ make
 #make -j to who have multi threading systems
 ```
 And you will have a *main* file in your folder to go.
+
+## After installing
+1- you will need to specefy your device range in the network descovry up in the satings and press "Update Satings"(or in the user.conf file)
+2- then restart the app
+## Notes&Bugs:
+- after evry satings changing , you may need to restart the app (working on it)
+- somtimes network discovring shows blank text (somtime)
+## Future Plane
+- re writing the gui side with a defrent library (sorry wxWidgets fans, but my brain cant geet the parncipile, i am more in low level to get this)
+- add a good text message gui
