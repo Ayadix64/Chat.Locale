@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <filesystem>
 #include <functional>
 #include <ios>
 #include <iostream>
@@ -24,7 +25,7 @@
 #include <unistd.h>
 #include <lz4.h>
 #include <zstd.h>
-
+extern std::vector<std::shared_ptr<connection>> cone;
 
 std::function<void(Image &img,unsigned int ID)> imageHandlingReq = [](auto,auto){return;};
 std::function<void(float* sound,unsigned int Size,unsigned int ID)> soundHandlerRequast = [](auto,auto,auto){return;};;
@@ -38,7 +39,7 @@ std::function<void(char* msg , unsigned int msLng, unsigned int ID)> readMsgHand
 std::function<void(unsigned int ID)> closeHandlerRequast = [](unsigned int ID){
 	for(int i  =  0 ; i < cone.size() ; i++){
 		if(cone[i]->getID() == ID){
-			logMsgs("CLOSING CONCETION", " @ " + cone[i]->getEndpoint().address().to_string() + " aka."+cone[i]->name);
+			logMsgs("CLOSING CONCETION", " @ " + cone[i]->getAddress().to_string() + " aka."+cone[i]->name);
 			break;
 		}
 	}
@@ -116,6 +117,9 @@ void server::FileHandler(){
 			
 		}
 		
+		std::filesystem::path realeName(fileName);//if some one some how sende us a file path in the file name, we will get a bad time
+		fileName=realeName.filename();
+
 		fileNS = fileName.size();
 		fileS = msfile->dataSize;
 		/**/

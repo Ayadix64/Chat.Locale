@@ -1,5 +1,6 @@
 #ifndef CMAIN
 #define CMAIN
+#include <atomic>
 #include <wx/wx.h>
 #include <memory_resource>
 
@@ -50,6 +51,7 @@ private:
 };
 
 
+struct fileSend{std::string file;unsigned int ID;};
 
 class Satings : public wxFrame
 {
@@ -86,15 +88,18 @@ public:
 	wxStaticBitmap  *imageScreen ;
 
 	int CapturingCamera = 0;
-	bool stopCapturing = false;
-	bool allowRecording = true;
+
+	std::atomic<bool> stopCapturing = false;
+	std::atomic<bool> allowRecording = true;
 
 
 	std::vector<wxButton*> btns;
-	bool StopFinding = false;
 
-	bool muteSpekers = false;
-	bool allowSoundRecording = true;
+	std::atomic<bool> StopFinding = false;
+	std::atomic<bool> muteSpekers = false;
+	std::atomic<bool> allowSoundRecording = true;
+	std::atomic<bool> SholdClose = false;
+	
 
 	wxPanel * Menupanel     ;
 	wxPanel * Body          ;
@@ -127,8 +132,12 @@ public:
 	void OnSendFileButton(wxCommandEvent& evt);
 	void OnSatingsButton(wxCommandEvent& evt);
 	void OnIpMan(wxCommandEvent& evt);
+	
+	std::vector<fileSend> m_filesToSende;
+	std::thread m_senderThread;
+	void FileSenderThread();
+	
 	wxDECLARE_EVENT_TABLE();
-
 };
 
 

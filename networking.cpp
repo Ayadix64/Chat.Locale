@@ -24,8 +24,6 @@ std::atomic<unsigned long> server_count;
 
 
 
-
-
 DevInNetwork::DevInNetwork(asio::io_context & io , ip::tcp::endpoint& ep)
 {
 	ping = (Packat*)malloc(PACKAT);
@@ -37,7 +35,6 @@ DevInNetwork::DevInNetwork(asio::io_context & io , ip::tcp::endpoint& ep)
 
 DevInNetwork::~DevInNetwork(){
 	FREE(ping);
-	
 	delete skt;
 }
 
@@ -56,12 +53,10 @@ void DevInNetwork::connect(){
 			return;
 		}
 		else if(skt->is_open()){
-			//IsTargitRuning(*skt);
 			skt->async_write_some(buffer((char*)ping,PACKAT),[&](std::error_code ec , size_t lg){
 				if(!ec){
 					skt->async_read_some(buffer((char*)ping, PACKAT) , [&](std::error_code ecc, size_t llg){
 						if(!ecc && ping->TYPE==PONG){
-							
 							is_open=true;
 							name="";
 							for(int i = 0 ; i < ping->msgL ; i++){
@@ -69,6 +64,9 @@ void DevInNetwork::connect(){
 							}
 							logMsgs("FIND", name);
 							FindHandler();
+							closeSocket(*skt);
+							delete this;
+						}else {
 							closeSocket(*skt);
 							delete this;
 						}
@@ -91,57 +89,9 @@ void DevInNetwork::FindHandler(){
 	return;
 }
 
-
-unsigned int addConection(ip::tcp::endpoint ep, io_context &io){
-	unsigned int ret = -1;
-	for(int i = 0 ; i < cone.size() ; i++){
-		if(cone[i]->getAddress() == ep.address()){
-			ret=i;
-			break;
-		}
-	}
-	if(ret==-1){
-		int ID=0;
-		for(int i = 0 ; i < cone.size() ; i++){
-			if(cone[i]->getID() == ID)ID++;
-		}
-		ret = cone.size();
-		cone.emplace_back( std::make_shared<connection>(ep,io,cone));
-	}
-	return ret;
-}
-
-
-
-unsigned int addConection(ip::tcp::socket &skt, io_context &io){
-	unsigned int ret = -1;
-	for(int i = 0 ; i < cone.size() ; i++){
-		if(cone[i]->getAddress() == skt.remote_endpoint().address()){
-			ret=i;
-			break;
-		}
-	}
-	if(ret==-1){
-		int ID=0;
-		for(int i = 0 ; i < cone.size() ; i++){
-			if(cone[i]->getID() == ID)ID++;
-		}
-		ret = cone.size();
-		//std::shared_ptr<connection> conc = std::make_shared<connection>(skt,io,ID);
-		//cone.push_back(conc);
-		cone.emplace_back(std::make_shared<connection>(skt.remote_endpoint(),io,cone));
-		//conc->ping();
-		//conc->readHandler();
-
-	}
-	return ret;
-}
-
 void addServer(ip::tcp::socket &skt, io_context &io ){
 	unsigned int c = addConection(skt.remote_endpoint() , io);
-	
 	new server(skt , cone[c],io );
-	
 	return ;
 }
 
@@ -194,28 +144,16 @@ void dicover(io_context &io , std::string Astart , std::string Aend ){
 
 	try{
 		ip::tcp::endpoint endp(ip::make_address_v4(Astart) , LISNT_PORT);
-
 		unsigned int start = ip::make_address_v4(Astart).to_uint();
 		unsigned int end = ip::make_address_v4(Aend).to_uint();
 		if(end<start) {
-			logMsgsErr("netdiscovering end is less than netdicovring start");
+			logMsgsErr("netdiscovering end is less than netdicovring start, \n\t\t --> pleaze checkout your config file");
 			return;
 		}
 
 		for(int i = start  ; i <  end ; i++){
 			endp.address(ip::make_address_v4(i));
-			//std::cout << "\n"<< endp.address() << "--" << endp.port();
-			try{
-				//std::shared_ptr<DevInNetwork> d = std::make_shared<DevInNetwork>(io,endp);
-				//dess.push_back(d);
-				//dess.emplace_back(std::make_shared<DevInNetwork>(io,endp));//never make the chorno angree,i main, if he see this code, i dont think that this will make any change
-
-				new DevInNetwork(io,endp);
-			}catch(std::system_error ec){
-				//probaly main that we cant connect to
-			}
-
-
+			new DevInNetwork(io,endp);
 		}
 	}catch(std::error_code ec){
 		logMsgsErr(ec.message());
@@ -223,20 +161,6 @@ void dicover(io_context &io , std::string Astart , std::string Aend ){
 	return;
 }
 
-
-
-
-
-unsigned int getConPos(unsigned int ID){
-	unsigned int ret = -1;
-	for(int i = 0 ; i < cone.size() ; i++){
-		if(cone[i]->getID() == ID){
-			ret=i;
-			break;
-		}
-	}
-	return ret;
-}
 
 
 void closeSocket(ip::tcp::socket& skt){
@@ -363,3 +287,6 @@ void networking_stop(){
 	delete mainContext;
 	return;
 }
+
+
+

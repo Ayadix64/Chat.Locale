@@ -1,13 +1,13 @@
 #include <asio/ip/address_v4.hpp>
 #include <cstring>
 
+#include <wx/wx.h>
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <unistd.h>
 
-#include <wx/wx.h>
 #include <wx/filedlg.h>
 #include <wx/gtk/filedlg.h>
 #include <wx/string.h>
@@ -51,6 +51,7 @@
 
 #include "cMain.h"
 #include "login.hpp"
+#include "networking.hpp"
 #include "soundIO.hpp"
 #include "utils.hpp"
 #include <cstdio>
@@ -75,8 +76,43 @@ wxBitmap Mat2Bitmap(cv::Mat& frame){
 	return wxBitmap(image);
 }
 
+#define WINDOW_DEFULT_W 1200
+#define WINDOW_DEFULT_H 800
+#define WINDOW_MIN_W 640
+#define WINDOW_MIN_H 480
+Vec2ui GetWindowSize(){
+	Vec2ui wh = {WINDOW_DEFULT_W,WINDOW_DEFULT_H};
+	
+	std::string w_str;
+	
+	if(readConf(USER_CONFIG, WINDOW_WIDTH_CONFIG , w_str)){
+		unsigned int width = std::stoi(w_str);
+		if(width<WINDOW_MIN_W){
+			logMsgs("WINDOW SIZE SMALLEST THAN THE MINMUL SIZE");
+			width=WINDOW_MIN_W;
+		}else {
+			wh.x=width;
+		}
+		
+	}
 
-cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , wxSize(1200,800)){
+	
+	std::string h_str;
+	
+	if(readConf(USER_CONFIG, WINDOW_HEIGTH_CONFIG , h_str)){
+		unsigned int heigth = std::stoi(h_str);
+		if(heigth<WINDOW_MIN_H){
+			logMsgs("WINDOW SIZE SMALLEST THAN THE MINMUL SIZE");
+			heigth=WINDOW_MIN_H;
+		}else {
+			wh.y=heigth;
+		}
+		
+	}
+	return wh;
+}
+
+cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , wxSize(GetWindowSize().x,GetWindowSize().y)){
 
 	satingswindow = new Satings(satingsOpen);
 	//Menus***********************************************************************
@@ -91,7 +127,7 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 
 	updateLogs();
 	wxStaticText * userHi = new
-		wxStaticText(Menupanel,wxID_ANY,(wxString)(std::string)("Hi, "+ std::string(g_isTacher?"Professor ":"") + user_name) , wxPoint(20,20) , wxSize(200,-1));
+	wxStaticText(Menupanel,wxID_ANY,(wxString)(std::string)("Hi, "+ std::string(g_isTacher?"Professor ":"") + user_name) , wxPoint(20,20) , wxSize(200,-1));
 	wxButton* satings = new wxButton(Menupanel,wxID_ANY ,  wxString::FromUTF8("\u2699") , wxDefaultPosition , wxSize(40,40) , wxBORDER_NONE);
 	satings->SetFont(headLineF);
 	satings->Bind(wxEVT_COMMAND_BUTTON_CLICKED,&cMain::OnSatingsButton,this);
@@ -229,7 +265,7 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 		}
 		if(ID==CleintDevID && getConPos(ID)!=-1){
 			CallAfter([=](){
-				std::string popout = cone[getConPos(ID)]->name;
+				std::string popout = Conection(ID)->name;
 				popout.append(" , send : \n");
 				popout.append(msg);
 				wxMessageBox(popout);
@@ -244,11 +280,12 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 	cameraCapturingReq = [&](unsigned int w , unsigned int h , unsigned char* data){
 		//logMsgs("SENDING IMAGE");
 		if(CleintDevID!=-1 && getConPos(this->CleintDevID)!=-1 && !g_isTacher){
-			cone[getConPos(CleintDevID)]->sendImage(h, w,data);
+			Conection(CleintDevID)->sendImage(h, w,data);
 		}else if(g_isTacher){
-			for(int i = 0 ; i < cone.size() ; i++){
-				if( i < cone.size() && cone[i]->getID() != -1){
-					cone[i]->sendImage(h, w, data);
+			for(int i = 0 ; i < ConctionsMatrixSize() ; i++){
+				connection* cc = GetConectionIn(i); 
+				if(cc!=nullptr){
+					cc->sendImage(h, w, data);
 				}
 				return ;
 			}
@@ -261,38 +298,33 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 
 
 	Bind(wxEVT_TIMER,[&](wxEvent &e){
+		/*********************** IN THE HOLE PROJECT, THIS FILE IS THE WORST ****************************/
+		/*********************** AND IN THE WHOLE FILE, THIS PLACE THE WORST ****************************/
+		for( ; ConectionsNumber<ConctionsMatrixSize() ; ConectionsNumber++){
 
-		for( ; ConectionsNumber<cone.size() ; ConectionsNumber++){
 
-
-				bt= new wxButton(buttons,START_DEV_BUT_ID+ConectionsNumber,(wxString)cone[ConectionsNumber]->name , wxDefaultPosition , wxDefaultSize);
-				btns.push_back(bt);
-				btns[ConectionsNumber]->Bind(wxEVT_COMMAND_BUTTON_CLICKED,&cMain::OnDevConButon,this);
-				butonsS->Add(btns[ConectionsNumber],1,wxTOP,5);
-				buttons->SetRowH(btns[ConectionsNumber]->m_height +5);
-				buttons->SetRowCount(ConectionsNumber);
-				//buttons->FitInside();
-				//butonsS->Layout();
-				//rootSizer->Layout();
-				this->Layout();
-				this->Refresh();
-				this->mesages.resize(ConectionsNumber+1);
+			bt= new wxButton(buttons,START_DEV_BUT_ID+ConectionsNumber,(wxString)GetConectionIn(ConectionsNumber)->name , wxDefaultPosition , wxDefaultSize);
+			btns.push_back(bt);
+			btns[ConectionsNumber]->Bind(wxEVT_COMMAND_BUTTON_CLICKED,&cMain::OnDevConButon,this);
+			butonsS->Add(btns[ConectionsNumber],1,wxTOP,5);
+			buttons->SetRowH(btns[ConectionsNumber]->m_height +5);
+			buttons->SetRowCount(ConectionsNumber);
+			//buttons->FitInside();
+			//butonsS->Layout();
+			//rootSizer->Layout();
+			this->Layout();
+			this->Refresh();
+			this->mesages.resize(ConectionsNumber+1);
 
 		}
-		for(int i = 0 ; i < ConectionsNumber && i < cone.size() ; i++ ){
-			if(btns[i]->GetLabel() != cone[i]->name){
-				btns[i]->SetLabel(cone[i]->name);
-				btns[i]->Refresh();
+		for(int i = 0 ; i < ConectionsNumber && i < ConctionsMatrixSize() ; i++ ){
+			if(btns[i]->GetLabel() != GetConectionIn(i)->name){
+				btns[i]->SetLabel(GetConectionIn(i)->name);
+				this->Refresh();
 			}
 		}
 
 		e.Skip();
-		/*|/| in our app, the cone mutrix dosnt been freed (just if the cleint send CLOSE), |\|*/
-		/*|\| even thogh that is in a side a terrabel memory mangment                       |/|*/
-		/*|/| but this is hulpful , say the user get conected by some one                   |\|*/
-		/*|\| out of the dicover rang , and disconect, it will be helpful                   |/|*/
-		/*|/| that is save the conectionn, so we dont have to do a discovring again         |\|*/
-
 
 	},timer->GetId());
 	timer->Start(100);
@@ -314,21 +346,13 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 
 	readSoundFromMicrophoneHandler = [&](float* r , unsigned int bufferL){
 		if(!g_isTacher && this->CleintDevID != -1 && this->allowSoundRecording && getConPos(this->CleintDevID)!=-1){
-			cone[getConPos(this->CleintDevID)]->sendSound(r, bufferL);
+			Conection(CleintDevID)->sendSound(r, bufferL);
 
 		}else if(g_isTacher && allowSoundRecording){
-			float* cpAu =(float*) malloc(bufferL*4);
-			memcpy(cpAu, r, bufferL*4);
-			std::thread([=](){
-				for(int i = 0 ; i < cone.size() ; i++){
-					unsigned int id = cone[i]->getID();
-					if(i < cone.size() && id==cone[i]->getID() && getConPos(id)!=-1){
-						cone[i]->sendSound(cpAu, bufferL);
-					}
-				}
+			for(int i = 0 ; i < ConctionsMatrixSize() ; i++){
+				GetConectionIn(i)->sendSound(r, bufferL);
+			}
 
-				free(cpAu);
-			}).detach();
 		}
 		return ;
 	};
@@ -344,8 +368,8 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 				this->ConectionsNumber--;
 			}
 
-			for(int i = 0 ; i < btns.size()-1  && i < cone.size(); i++){
-				btns[i]->SetLabel(cone[i]->name);//we update buttons, instade of erase ,
+			for(int i = 0 ; i < btns.size()-1  && i < ConctionsMatrixSize(); i++){
+				btns[i]->SetLabel(GetConectionIn(i)->name);//we update buttons, instade of erase ,
 				btns[i]->Refresh();
 			}
 			butonsS->Show(btns[btns.size()-1],false);
@@ -362,11 +386,11 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 
 		return ;
 	};
-
+	
 	fileHandlerRequastComplite = [&](std::string fn , unsigned int size , unsigned int ID){
 		CallAfter([=](){
 			if(getConPos(ID)==-1)return ;
-			std::string msg = cone[getConPos(ID)]->name;
+			std::string msg = Conection(CleintDevID)->name;
 			msg .append(" send file : \n\"");
 			msg.append(fn);
 			msg.append( "\" - " + std::to_string(size) + " byte");
@@ -375,13 +399,28 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 		});
 		return ;
 	};
-
+	m_senderThread=std::thread([&](){
+		while(!SholdClose){
+			while(m_filesToSende.size()){
+				Conection(m_filesToSende[m_filesToSende.size()-1].ID)->sendFile(m_filesToSende[m_filesToSende.size()-1].file);
+				m_filesToSende.pop_back();
+			}
+		}
+	});	
 }
 
 
 cMain::~cMain(){
+	SholdClose=true;
+	stopCapturing=true;
+	muteSpekers=true;
+	allowRecording=false;
+
 	if(timer){
 		timer->Stop();
+	}
+	if(m_senderThread.joinable()){
+		m_senderThread.join();
 	}
 	soundIOStop();
 	CameraStop();
@@ -393,10 +432,9 @@ cMain::~cMain(){
 
 void cMain::OnDevConButon(wxCommandEvent&evt){
 
-	CleintDevID = cone[evt.GetId() - START_DEV_BUT_ID]->getID();
-	//cone[CleintDevID]->sendFile("../CMakeLists.txt");
-
-
+	CleintDevID =GetConectionIn(evt.GetId() - START_DEV_BUT_ID)->getID();
+	evt.Skip();
+	return;
 }
 
 void cMain::OnIpMan(wxCommandEvent& evt){
@@ -415,8 +453,8 @@ void cMain::OnIpMan(wxCommandEvent& evt){
 
 
 void cMain::OnTextBoxPressEnter(wxCommandEvent & evt){
-	if(this->CleintDevID!=-1){
-		cone[this->CleintDevID]->sendMSG((std::string)msgTB->GetValue());
+	if(getConPos(this->CleintDevID)!=-1){
+		Conection(CleintDevID)->sendMSG((std::string)msgTB->GetValue());
 		Msgs msg {this->CleintDevID,true,"",false,(std::string)msgTB->GetValue()};
 		mesages[CleintDevID].push_back(msg);
 		msgTB->Clear();
@@ -438,7 +476,7 @@ void cMain::OnSendFileButton(wxCommandEvent& evt){
 	}
 	wxFileDialog fdg(this , "Send File" , "","",".* File (*.*)|*.*",wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 	if(fdg.ShowModal()==wxID_OK){
-		cone[this->CleintDevID]->sendFile((std::string)fdg.GetPath().ToUTF8().data());
+		m_filesToSende.push_back({(std::string)fdg.GetPath().ToUTF8().data(),CleintDevID});
 	}
 	return;
 }

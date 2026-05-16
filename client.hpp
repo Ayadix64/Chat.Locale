@@ -12,7 +12,6 @@ class connection:
 {
 	std::vector <std::shared_ptr<connection>>* conectionBuf;
 	
-	asio::ip::tcp::endpoint endp;
 	asio::ip::address adress;
 	asio::io_context* io=nullptr;
 	
@@ -46,7 +45,6 @@ public:
 	void sendPong();	
 	void sendClose();
 	void Close();
-	ip::tcp::endpoint getEndpoint();
 
 	void sendMSG(std::string send_);
 	bool is_open();
@@ -56,6 +54,16 @@ public:
 };
 
 
-extern std::vector<std::shared_ptr<connection>> cone;
+
+connection*  Conection(unsigned long ID);
+unsigned int getConPos(unsigned long ID);
+
+unsigned int addConection(ip::tcp::socket &skt, io_context &io);
+unsigned int addConection(ip::tcp::endpoint ep, io_context &io);
+
+unsigned int  ConctionsMatrixSize();
+unsigned long GetConectionMatrixID(unsigned int pos);
+void 	      GetConectionName(std::string& name, unsigned int pos);
+connection*   GetConectionIn(unsigned int pos);
 
 #endif

@@ -134,24 +134,15 @@ void networking_init();
 void networking_stop();
 
 
-unsigned int addConection(ip::tcp::endpoint ep, io_context &io);
 
 
 
-unsigned int addConection(ip::tcp::socket &skt, io_context &io );
 
 void addServer(ip::tcp::socket &skt, io_context &io);
 void ClientHandl(asio::ip::tcp::acceptor *accept , io_context* io );
 
 
-
-
 void dicover(io_context &io , std::string Astart , std::string Aend );
-
-
-unsigned int getConPos(unsigned int ID);
-
-
 
 
 

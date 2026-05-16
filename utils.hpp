@@ -46,7 +46,7 @@ static void resetConsolCl(){
 	return;
 }
 
-typedef  struct {unsigned int x=0, y=0;} Vec2ui;
+typedef  struct Vec2ui{unsigned int x=0, y=0;} Vec2ui;
 
 
 
