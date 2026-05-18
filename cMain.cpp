@@ -50,6 +50,7 @@
 #include <opencv2/opencv.hpp>
 
 #include "cMain.h"
+#include "config.hpp"
 #include "login.hpp"
 #include "networking.hpp"
 #include "soundIO.hpp"
@@ -112,6 +113,32 @@ Vec2ui GetWindowSize(){
 	return wh;
 }
 
+bool getSoundPrefernese(){
+	bool conf = true;
+	std::string inConf;
+	if(readConf(USER_CONFIG, SOUND_ALLOW_CONFIG, inConf)){
+		if(inConf=="true"){
+			conf=true;
+		}else if (inConf=="false") {
+			conf=false;
+		}
+	}
+	return conf;
+}
+
+bool getVideoPrefernese(){
+	bool conf = true;
+	std::string inConf;
+	if(readConf(USER_CONFIG, VIDEO_ALLOW_CONFIG, inConf)){
+		if(inConf=="true"){
+			conf=true;
+		}else if (inConf=="false") {
+			conf=false;
+		}
+	}
+	return conf;
+}
+
 cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , wxSize(GetWindowSize().x,GetWindowSize().y)){
 
 	satingswindow = new Satings(satingsOpen);
@@ -158,22 +185,44 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 	
 
 	IntractSizer->Add(screenVe , 5 , wxEXPAND|wxALL,10);
+	/*******************************Privacy controle *******************************************/
+	wxPanel* privacyControle = new wxPanel(Intrcating);	
+	wxSizer* privacyControleSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxCheckBox *allowVRecCB = new wxCheckBox(privacyControle,wxID_ANY,"Allow Sende Video");
+	wxCheckBox *allowSRecCB = new wxCheckBox(privacyControle,wxID_ANY,"Allow Sende Audio");
+	allowRecording=getVideoPrefernese();
+	allowSoundRecording=getSoundPrefernese();
+	
+	allowSRecCB->SetValue(allowSoundRecording);
+	allowVRecCB->SetValue(allowRecording);
+	
+	privacyControleSizer->Add(allowSRecCB,1,wxEXPAND|wxALL);
+	privacyControleSizer->Add(allowVRecCB,1,wxEXPAND|wxALL);
+	privacyControleSizer->AddStretchSpacer(2);
+	
+	allowSRecCB->Bind(wxEVT_CHECKBOX,[&](wxCommandEvent& evt){allowSoundRecording=!allowSoundRecording;evt.Skip();});
+	allowVRecCB->Bind(wxEVT_CHECKBOX,[&](wxCommandEvent& evt){allowRecording=!allowRecording;evt.Skip();});
+	
+	privacyControle->SetSizer(privacyControleSizer);
+	privacyControleSizer->Layout();
 
 
-
+	IntractSizer->Add(privacyControle,wxEXPAND|wxALL,10);
+	
+	/*******************************Messaging gui (TODO) ********************************************/
 	wxPanel* mesaging = new wxPanel(Intrcating);
 	wxSizer * mesageSzr = new wxBoxSizer(wxVERTICAL);
 
-
+	/********************************Sneding Area*********************************/
 
 	wxPanel* sender = new wxPanel(mesaging);
 	wxSizer* senderSizer= new wxBoxSizer(wxHORIZONTAL);
 	msgTB = new wxTextCtrl(sender,wxID_ANY , "" , wxPoint(0,30),wxSize(300,-1) , wxTE_PROCESS_ENTER);
 
-
 	msgTB->Connect(wxEVT_TEXT_ENTER, (wxObjectEventFunction)&cMain::OnTextBoxPressEnter, NULL,this);
 	senderSizer->Add(msgTB,1,wxEXPAND|wxLEFT|wxRIGHT);
 
+	
 	wxButton* fileSender =  new wxButton(sender,wxID_ANY ,  "+" , wxDefaultPosition , wxSize(40,40) );
 	fileSender->SetFont(headLineF);
 	fileSender->Bind(wxEVT_COMMAND_BUTTON_CLICKED,&cMain::OnSendFileButton,this);
@@ -279,6 +328,7 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 
 	cameraCapturingReq = [&](unsigned int w , unsigned int h , unsigned char* data){
 		//logMsgs("SENDING IMAGE");
+		if(!allowRecording)return ;
 		if(CleintDevID!=-1 && getConPos(this->CleintDevID)!=-1 && !g_isTacher){
 			Conection(CleintDevID)->sendImage(h, w,data);
 		}else if(g_isTacher){

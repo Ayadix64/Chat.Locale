@@ -89,8 +89,8 @@ public:
 
 	int CapturingCamera = 0;
 
-	std::atomic<bool> stopCapturing = false;
-	std::atomic<bool> allowRecording = true;
+	std::atomic<bool> stopCapturing = false;//this is for screen capturing, but i dont have screen capturing , TODO
+	std::atomic<bool> allowRecording = true;//camera capturing
 
 
 	std::vector<wxButton*> btns;
@@ -148,13 +148,9 @@ public:
 	~cMainLogIn();
 	cMain* workwindow;
 	wxCheckBox * teacherBox;
-	//wxButton* btn1 = nullptr;
-	//wxButton* btn2 = nullptr;
 	wxTextCtrl *textBox = nullptr;
-	//wxListBox* listbox  = nullptr;
 	wxButton * btn1 = nullptr;
 	wxButton* btn2 = nullptr;
-		//wxDECLARE_EVENT_TABLE();
 
 	void OnButtonClicked(wxCommandEvent& evnt);
 };

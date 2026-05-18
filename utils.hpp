@@ -9,6 +9,8 @@
 
 #define WINDOW_WIDTH_CONFIG  "window_w"
 #define WINDOW_HEIGTH_CONFIG "window_h"
+#define SOUND_ALLOW_CONFIG  "AllowSendSound"
+#define VIDEO_ALLOW_CONFIG  "AllowSendVideo"
 
 
 
