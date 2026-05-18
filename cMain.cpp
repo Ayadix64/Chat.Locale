@@ -461,6 +461,8 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 
 
 cMain::~cMain(){
+	writeConf(USER_CONFIG, SOUND_ALLOW_CONFIG, allowSoundRecording?"true":"false");
+	writeConf(USER_CONFIG, VIDEO_ALLOW_CONFIG, allowRecording?"true":"false");
 	SholdClose=true;
 	stopCapturing=true;
 	muteSpekers=true;
@@ -699,7 +701,7 @@ Satings::Satings(bool& isopen): wxFrame(nullptr, wxID_ANY, "Chat.Locale Satings"
 	teacher->SetValue(g_isTacher);
 
 	rootS->Add(teacher,1,wxALL,10);
-
+	
 
 	updateSatings=new wxButton(this,wxID_ANY,"Update Satings");
 	updateSatings->Bind(wxEVT_COMMAND_BUTTON_CLICKED,&Satings::OnUpdateSatings , this);
