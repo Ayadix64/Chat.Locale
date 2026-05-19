@@ -139,8 +139,9 @@ bool getVideoPrefernese(){
 	return conf;
 }
 
-cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , wxSize(GetWindowSize().x,GetWindowSize().y)){
 
+
+cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , wxSize(GetWindowSize().x,GetWindowSize().y)){
 	satingswindow = new Satings(satingsOpen);
 	//Menus***********************************************************************
 	wxFont headLineF(wxFontInfo(wxSize(0,36)).Bold());
@@ -243,7 +244,7 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 
 	Intrcating->SetSizerAndFit(IntractSizer);
 	IntractSizer->Layout();
-
+	/*********************************************************************************/
 	BodyS->Add(Intrcating,2,wxEXPAND|wxALL);
 
 
@@ -283,9 +284,6 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 				
 				imageScreen->SetBitmap(wxBitmap(*image));
 			    	
-				/*if(ix!=image->GetWidth()||iy!=image->GetWidth()){
-                  			  BodyS->Layout();
-				}*/
 				free(imageBitMapReseved);
 				delete image;
 			});
@@ -359,9 +357,6 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 			butonsS->Add(btns[ConectionsNumber],1,wxTOP,5);
 			buttons->SetRowH(btns[ConectionsNumber]->m_height +5);
 			buttons->SetRowCount(ConectionsNumber);
-			//buttons->FitInside();
-			//butonsS->Layout();
-			//rootSizer->Layout();
 			this->Layout();
 			this->Refresh();
 			this->mesages.resize(ConectionsNumber+1);
@@ -371,6 +366,7 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 			if(btns[i]->GetLabel() != GetConectionIn(i)->name){
 				btns[i]->SetLabel(GetConectionIn(i)->name);
 				this->Refresh();
+				this->Layout();
 			}
 		}
 
@@ -383,9 +379,7 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 
 
 	soundHandlerRequast = [&](float* data, unsigned int Size , unsigned int ID){
-		//std::cout<<"Sond have been araved\n";
 		if(ID==this->CleintDevID && !this->muteSpekers && getConPos(this->CleintDevID)!=-1 ){
-			//dataToPlay.reserve(Size);
 			for(unsigned int i = 0 ; i < Size; i++){
 				dataToPlay.push_back(data[i]);
 			}
@@ -424,9 +418,6 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 			}
 			butonsS->Show(btns[btns.size()-1],false);
 			btns.pop_back();
-			//butonsS->Detach(btns[btns.size()-1]);
-			//butonsS->Hide(btns[btns.size()-1]);
-			//btns[btns.size()-1]->Show(false);
 
 			buttons->SetRowCount(ConectionsNumber);
 			this->Layout();

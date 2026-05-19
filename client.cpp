@@ -185,14 +185,13 @@ void connection::sendImage(unsigned int hight , unsigned int width , unsigned ch
 
 	unsigned int dataWroten = 0;
 	
-	Packat ready{.TYPE=READY,.Mgic=MAGIC,.msgL=0};
-	//if(imgData==nullptr)return;
 	memcpy(ims.data, imgData, std::min(Size,(unsigned int)sizeof(ims.data)));
 	dataWroten+=	std::min(Size,(unsigned int)sizeof(ims.data));
 	memcpy(ms.data, &ims, std::min(sizeof(ms.data) , sizeof(ims)));
 	
 	bool ret = false;
 	sk.write_some(buffer(&ms,PACKAT) , ec);
+	sk.wait(sk.wait_write);
 	if(ec){
 		logMsgs("ERROR SENDING IMAGE", ec.message());
 		closeSocket(sk);
@@ -467,10 +466,12 @@ void connection::sendMSG(std::string send_){
 void connection::sendPong(){
 	Packat Pong;
 	unsigned int sendS = std::min(sizeof(Packat::data) , user_name.size());
+	
 	Pong.msgL = sendS;
 	Pong.Mgic=MAGIC;
+	Pong.TYPE=PONG;
+
 	memcpy(Pong.data, user_name.c_str(), sendS);//it will be beter , if we send a warning her
-	std::error_code ec;
 	ip::tcp::socket sk(*io);
 	std::error_code e;
 	sk.connect(ip::tcp::endpoint(adress,LISNT_PORT), e);
@@ -479,14 +480,19 @@ void connection::sendPong(){
 		closeSocket(sk);
 		return;
 	}
-	sk.write_some(buffer(&Pong,PACKAT),e);
-	if(e){
-		logMsgsErr(e.message());
-		closeSocket(sk);
-		return;
+	if(sk.is_open()){
+		sk.write_some(buffer(&Pong,PACKAT),e);
+		if(e){
+			logMsgs("ERORR SENDING PONG", e.message());
+	
+			closeSocket(sk);
+			return;
+		}
+		sk.wait(sk.wait_write);
+		if(sk.is_open()){
+			closeSocket(sk);
+		}
 	}
-	sk.wait(sk.wait_write);
-	closeSocket(sk);
 	return;
 	
 }
@@ -556,6 +562,7 @@ void GetConectionName(std::string& name, unsigned int pos){
 	}
 	return;
 }
+
 connection* GetConectionIn(unsigned int pos){
 	if(pos<cone.size()){
 		return cone[pos].get();

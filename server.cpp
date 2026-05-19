@@ -1,5 +1,6 @@
 #include "server.hpp"
 #include "login.hpp"
+#include "networking.hpp"
 #include "utils.hpp"
 #include <asio/buffer.hpp>
 #include <asio/error.hpp>
@@ -84,7 +85,7 @@ void server::pingHandler(){
 
 	msg.TYPE =PONG;
 	msg.Mgic =MAGIC;
-	msg.msgL = user_name.size();
+	msg.msgL = std::min(user_name.size(),sizeof(Packat::data));
 	memset(msg.data, 0, sizeof(msg.data));
 	memcpy(msg.data, user_name.c_str(), (size_t)std::min((int)user_name.size() , PACKAT));
 	try{
@@ -339,7 +340,6 @@ void server::CloseHandler(){
 	
 	this->conction->Close();//kill your master
 	
-	this->close();//and then , kill your selfe	
 	delete this;
 	return;	
 }
