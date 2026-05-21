@@ -488,7 +488,7 @@ server::~server(){
 	if(server_count){
 		server_count--;
 	}else {
-		logMsgs("UN-EXPECTED ERORR","server count = 0 and servers are not");
+		logMsgs("UN-EXPECTED ERORR","server count = 0 even thogh they are servers");
 	}
 	return;
 }

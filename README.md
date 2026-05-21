@@ -1,8 +1,9 @@
-# Chat.Locale
+<div align="center">
+<h1> Chat.Locale</h1>
 <img src="Picturs/p1.png"></img>
 
-A cross-platform multi-threading peer-to-peer chatting app programmed in C++
-
+<h3>A cross-platform multi-threading peer-to-peer chatting app programmed in C++</h3>
+</div>
 This app is still in alpha, also known as prototype, and is not stable
 
 ### It uses:
@@ -77,7 +78,6 @@ Here are some useful links:
 ## Compiling
 Note: you need CMake ready on your machine
 ``` bash
-cd Chat.Locale
 mkdir build
 cd build
 cmake ..

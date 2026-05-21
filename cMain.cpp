@@ -202,7 +202,29 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 	privacyControleSizer->AddStretchSpacer(2);
 	
 	allowSRecCB->Bind(wxEVT_CHECKBOX,[&](wxCommandEvent& evt){allowSoundRecording=!allowSoundRecording;evt.Skip();});
-	allowVRecCB->Bind(wxEVT_CHECKBOX,[&](wxCommandEvent& evt){allowRecording=!allowRecording;evt.Skip();});
+	allowVRecCB->Bind(wxEVT_CHECKBOX,[&](wxCommandEvent& evt){	
+		allowRecording=!allowRecording;
+		if(!allowRecording){
+			const unsigned int h = 480, w=640;
+			unsigned char* data = (unsigned char*)malloc(h*w*3);
+			for(int i = 0 ; i < h*w*3 ; i++){
+				data[i]=10;
+			}
+			if(CleintDevID!=-1 && getConPos(this->CleintDevID)!=-1 && !g_isTacher){
+				Conection(CleintDevID)->sendImage(h, w,data);
+			}else if(g_isTacher){
+				for(int i = 0 ; i < ConctionsMatrixSize() ; i++){
+					connection* cc = GetConectionIn(i); 
+					if(cc!=nullptr){
+						cc->sendImage(h, w, data);
+					}
+					return ;
+				}
+
+			}
+		}
+		evt.Skip();
+	});
 	
 	privacyControle->SetSizer(privacyControleSizer);
 	privacyControleSizer->Layout();
@@ -303,7 +325,6 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 
 
 	std::vector<wxStaticText*> v_mesagesStaticText;
-	static unsigned int messaH = 0;
 	readMsgHandlerRequast=[&](char* ms , unsigned int lng, unsigned int ID){
 		std::string msg;
 		//msg.reserve(lng);
@@ -443,7 +464,11 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 	m_senderThread=std::thread([&](){
 		while(!SholdClose){
 			while(m_filesToSende.size()){
-				Conection(m_filesToSende[m_filesToSende.size()-1].ID)->sendFile(m_filesToSende[m_filesToSende.size()-1].file);
+				if(Conection(m_filesToSende[m_filesToSende.size()-1].ID)!=nullptr){
+					Conection(m_filesToSende[m_filesToSende.size()-1].ID)->sendFile(m_filesToSende[m_filesToSende.size()-1].file);
+				}else{
+					logMsgsErr("un-able to sende file \""+m_filesToSende[m_filesToSende.size()-1].file+"\", target not found");
+				}
 				m_filesToSende.pop_back();
 			}
 		}

@@ -380,16 +380,16 @@ void connection::sendClose(){
 
 
 void connection::Close(){
+	g_conection_vector_mutex.lock();
 	unsigned int pos = getVecPos();
 	if(pos!=-1){
 		m_close=true;
 		while (m_operationOpend) {std::cout<<"."<<std::flush;usleep(100000);}//TODO: this is probably bad, some how , it is bad, like realy
-		g_conection_vector_mutex.lock();
 		conectionBuf->erase(conectionBuf->begin() + pos);
-		g_conection_vector_mutex.unlock();
 	}else{
 		logMsgsErr("CONCTION OBJECT , nevr found his selfe :(");
 	}
+	g_conection_vector_mutex.unlock();
 	return;
 }
 
@@ -581,7 +581,6 @@ unsigned int connection::getVecPos(){
 
 
 unsigned int getConPos(unsigned long ID){
-	g_conection_vector_mutex.lock();
 	unsigned int ret = -1;
 	for(int i = 0 ; i < cone.size() ; i++){
 		if(cone[i]->getID() == ID){
@@ -589,7 +588,6 @@ unsigned int getConPos(unsigned long ID){
 			break;
 		}
 	}
-	g_conection_vector_mutex.unlock();
 	return ret;
 }
 
