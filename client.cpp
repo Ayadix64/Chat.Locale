@@ -1,8 +1,11 @@
 #include "client.hpp"
 #include "networking.hpp"
 #include <lz4.h>
+#include <mutex>
+#include <ostream>
+#include <unistd.h>
 #include <zstd.h>
-
+std::mutex g_conection_vector_mutex;
 extern std::vector<std::shared_ptr<connection>> cone;
 
 
@@ -66,6 +69,10 @@ void connection::sendFile(std::string fileP)
 		FREE(mlc);
 		return ;
 	}
+	
+
+	m_operationOpend++;
+
 	Packat ms;
 	FileMs fms;
 	
@@ -104,6 +111,7 @@ void connection::sendFile(std::string fileP)
 		logMsgs("ERROR SENDING FILE", ec.message());
 		closeSocket(sk);
 		FREE(mlc);
+		m_operationOpend--;
 		return ;
 	}
 	sk.wait(sk.wait_write);
@@ -126,6 +134,8 @@ void connection::sendFile(std::string fileP)
 			logMsgs("ERROR SENDING FILE", ec.message());
 			closeSocket(sk);
 			FREE(mlc);
+			
+			m_operationOpend--;
 			return ;
 		}
 
@@ -134,7 +144,7 @@ void connection::sendFile(std::string fileP)
 	
 	ifl.close();
 	FREE(mlc);
-	
+	m_operationOpend--;
 	return ;
 		
 }
@@ -166,7 +176,7 @@ void connection::sendImage(unsigned int hight , unsigned int width , unsigned ch
 	}
 	Packat ms;
 	ImageMs ims;
-	
+	m_operationOpend++;
 	memset(&ms , 0, sizeof(ms ));
 	memset(&ims, 0, sizeof(ims));
 	
@@ -199,6 +209,7 @@ void connection::sendImage(unsigned int hight , unsigned int width , unsigned ch
 			FREE(imgData);
 			imgData=nullptr;
 		}
+		m_operationOpend--;
 		return ;
 	}
 	
@@ -221,6 +232,7 @@ void connection::sendImage(unsigned int hight , unsigned int width , unsigned ch
 				FREE(imgData);
 				imgData=nullptr;
 			}
+			m_operationOpend--;
 			return ;
 		}
 		sk.wait(sk.wait_write);
@@ -231,6 +243,7 @@ void connection::sendImage(unsigned int hight , unsigned int width , unsigned ch
 		FREE(imgData);
 		imgData=nullptr;
 	}
+	m_operationOpend--;
 	return ;
 
 }
@@ -257,6 +270,8 @@ void connection::sendSound(float* data__ , unsigned int ln){
 	}
 	Packat ms;
 	SoundMs sms; //some remember a thing rigth now..
+	
+	m_operationOpend++;
 	
 	memset(&ms , 0, sizeof(ms ));
 	memset(&sms, 0, sizeof(sms));
@@ -286,6 +301,7 @@ void connection::sendSound(float* data__ , unsigned int ln){
 			FREE(data);
 			data=nullptr;
 		}
+		m_operationOpend--;
 		return ;
 	}
 	sk.wait(sk.wait_write);
@@ -311,17 +327,20 @@ void connection::sendSound(float* data__ , unsigned int ln){
 				FREE(data);
 				data=nullptr;
 			}
+			m_operationOpend--;
 			return ;
 		}
 		sk.wait(sk.wait_write);
 	
 	}
+
 	if(data!=nullptr){
 		FREE(data);
 		data=nullptr;
 	}
 	
 	closeSocket(sk);
+	m_operationOpend--;
 	return ;
 }
 
@@ -341,15 +360,21 @@ void connection::sendClose(){
 		ret=true;
 	}
 	if(ret||ec){
+		closeSocket(sk);
 		return ;;
 	}
+	
+	m_operationOpend++;
+	
 	sk.write_some(buffer(&msg , PACKAT) ,ec);
 	if(ec){
 		logMsgsErr(ec.message());
 		ret=true;
+	}else {
+		sk.wait(sk.wait_write);
 	}
-	sk.wait(sk.wait_write);
 	closeSocket(sk);
+	m_operationOpend--;
 	return;
 }
 
@@ -358,7 +383,10 @@ void connection::Close(){
 	unsigned int pos = getVecPos();
 	if(pos!=-1){
 		m_close=true;
+		while (m_operationOpend) {std::cout<<"."<<std::flush;usleep(100000);}//TODO: this is probably bad, some how , it is bad, like realy
+		g_conection_vector_mutex.lock();
 		conectionBuf->erase(conectionBuf->begin() + pos);
+		g_conection_vector_mutex.unlock();
 	}else{
 		logMsgsErr("CONCTION OBJECT , nevr found his selfe :(");
 	}
@@ -380,14 +408,20 @@ void connection::ping(){
 		ret=true;
 	}
 	if(ret||ec){
+		closeSocket(sk);
 		return ;;
 	}
+	
+	m_operationOpend++;
+	
 	sk.write_some(buffer(&msg , PACKAT) ,ec);
 	if(ec){
 		logMsgsErr(ec.message());
 		ret=true;
 	}
 	if(ret || ec){
+		closeSocket(sk);
+		m_operationOpend--;
 		return ;;
 	}
 	sk.wait(sk.wait_read);
@@ -398,6 +432,8 @@ void connection::ping(){
 		ret=true;
 	}
 	if(ret || ec){
+		closeSocket(sk);
+		m_operationOpend--;
 		return ;;
 	}
 
@@ -406,6 +442,8 @@ void connection::ping(){
 		name.push_back(msg.data[i]);
 	}
 	closeSocket(sk);
+	m_operationOpend--;
+	return;
 }
 
 
@@ -430,6 +468,8 @@ void connection::sendMSG(std::string send_){
 		return ;
 	}
 	
+	m_operationOpend++;
+	
 	msg.TYPE=MESSAGE;
 	msg.msgL=send.size();
 	msg.Mgic=MAGIC;
@@ -450,6 +490,7 @@ void connection::sendMSG(std::string send_){
 			if(ec){
 				logMsgs("ERORR SENDING", ec.message());
 				closeSocket(sk);
+				m_operationOpend--;	
 				return ;
 			}
 			sk.wait(sk.wait_write);
@@ -459,6 +500,7 @@ void connection::sendMSG(std::string send_){
 		}
 	}
 	closeSocket(sk);
+	m_operationOpend--;
 	return ;
 }
 
@@ -480,12 +522,15 @@ void connection::sendPong(){
 		closeSocket(sk);
 		return;
 	}
+	
+	m_operationOpend++;
+	
 	if(sk.is_open()){
 		sk.write_some(buffer(&Pong,PACKAT),e);
 		if(e){
 			logMsgs("ERORR SENDING PONG", e.message());
-	
 			closeSocket(sk);
+			m_operationOpend--;
 			return;
 		}
 		sk.wait(sk.wait_write);
@@ -493,6 +538,8 @@ void connection::sendPong(){
 			closeSocket(sk);
 		}
 	}
+
+	m_operationOpend--;
 	return;
 	
 }
@@ -516,6 +563,7 @@ unsigned long connection::getUsebelID(){
 }
 
 unsigned int connection::getVecPos(){
+	g_conection_vector_mutex.lock();
 	unsigned int ret = -1;
 	for(int i = 0 ; i < this->conectionBuf->size() ; i++){
 		unsigned int fID = this->conectionBuf->at(i)->ID;
@@ -524,6 +572,7 @@ unsigned int connection::getVecPos(){
 			break;
 		}
 	}
+	g_conection_vector_mutex.unlock();
 	return ret;
 
 }
@@ -532,6 +581,7 @@ unsigned int connection::getVecPos(){
 
 
 unsigned int getConPos(unsigned long ID){
+	g_conection_vector_mutex.lock();
 	unsigned int ret = -1;
 	for(int i = 0 ; i < cone.size() ; i++){
 		if(cone[i]->getID() == ID){
@@ -539,6 +589,7 @@ unsigned int getConPos(unsigned long ID){
 			break;
 		}
 	}
+	g_conection_vector_mutex.unlock();
 	return ret;
 }
 

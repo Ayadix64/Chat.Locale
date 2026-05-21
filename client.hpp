@@ -23,7 +23,9 @@ class connection:
 	unsigned long ID=0;
 	unsigned long getUsebelID();//this .. do what is sounds it do
 	unsigned int getVecPos(); 
-	bool m_close = false;
+	std::atomic<bool> m_close = false;
+
+	std::atomic<unsigned int> m_operationOpend=0;
 
 public:
 	std::string name;
