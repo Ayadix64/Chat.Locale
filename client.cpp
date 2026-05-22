@@ -380,16 +380,16 @@ void connection::sendClose(){
 
 
 void connection::Close(){
-	g_conection_vector_mutex.lock();
 	unsigned int pos = getVecPos();
 	if(pos!=-1){
 		m_close=true;
 		while (m_operationOpend) {std::cout<<"."<<std::flush;usleep(100000);}//TODO: this is probably bad, some how , it is bad, like realy
+		g_conection_vector_mutex.lock();
 		conectionBuf->erase(conectionBuf->begin() + pos);
+		g_conection_vector_mutex.unlock();
 	}else{
 		logMsgsErr("CONCTION OBJECT , nevr found his selfe :(");
 	}
-	g_conection_vector_mutex.unlock();
 	return;
 }
 
@@ -635,8 +635,10 @@ unsigned int addConection(ip::tcp::endpoint ep, io_context &io){
 		for(int i = 0 ; i < cone.size() ; i++){
 			if(cone[i]->getID() == ID)ID++;
 		}
+		g_conection_vector_mutex.lock();
 		ret = cone.size();
 		cone.emplace_back( std::make_shared<connection>(ep,io,cone));
+		g_conection_vector_mutex.unlock();
 	}
 	return ret;
 }
@@ -656,9 +658,10 @@ unsigned int addConection(ip::tcp::socket &skt, io_context &io){
 		for(int i = 0 ; i < cone.size() ; i++){
 			if(cone[i]->getID() == ID)ID++;
 		}
+		g_conection_vector_mutex.lock();
 		ret = cone.size();
 		cone.emplace_back(std::make_shared<connection>(skt.remote_endpoint(),io,cone));
-
+		g_conection_vector_mutex.unlock();
 	}
 	return ret;
 }

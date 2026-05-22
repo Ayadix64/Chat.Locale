@@ -61,7 +61,7 @@ using namespace asio;
 #define PACKAT 0x10000
 
 
-#define PACK_HS 16// Message hader size sizeof int*2+long = long+long = 8+8 = 16 , maths
+#define PACK_HS 20// Message hader size sizeof int*2+long = long+long = 8+8 = 16 , maths
 
 void closeSocket(ip::tcp::socket& skt);
 
@@ -70,9 +70,9 @@ void closeSocket(ip::tcp::socket& skt);
 
 
 struct Packat {
-		unsigned int  TYPE  = PING       ;
-		unsigned long Mgic  = MAGIC      ;
-		unsigned int  msgL  = 0          ;
+		unsigned int   TYPE  = PING       ;
+		unsigned long  Mgic  = MAGIC      ;
+		unsigned long  msgL  = 0          ;
 		char data [PACKAT-PACK_HS];
 }__attribute__((packed)) ;
 
@@ -84,11 +84,11 @@ struct Message{
 };
 struct FileMs {//it livs in Message::MES
 
-		unsigned int fileNameL = 0       ;
-		unsigned int partN     = 0       ;
-		unsigned int dataSize  = 0       ;
+		unsigned int  fileNameL = 0       ;
+		unsigned long partN     = 0       ;
+		unsigned long dataSize  = 0       ;
 
-		char data [PACKAT-PACK_HS-12] ;
+		char data [PACKAT-PACK_HS-20] ;
 }__attribute__((packed)) ;
 
 struct ImageMs {//it livs in Message::MES

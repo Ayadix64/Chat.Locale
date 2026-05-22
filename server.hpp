@@ -9,7 +9,7 @@ using namespace asio;
 class server
 : public std::enable_shared_from_this<server>
 {
-public:
+private:
 	std::shared_ptr<connection> conction;
 	
 	ip::tcp::socket*skt;
@@ -27,6 +27,7 @@ public:
 	unsigned int fileNS = 0;//file name size
 	unsigned int fileS =0;	//file Size
 	
+	
 	char* ImgB =nullptr;//image buffer
 	unsigned int Iptr;//image buffer ptr
 	unsigned int ISize;//image size
@@ -34,10 +35,13 @@ public:
 	unsigned int imageWidth=0;//as it sounds
 	unsigned int imageHeight=0;
 
+	
 	char* SondB =nullptr;//sound buffer
 	unsigned int Sptr=0;//sound buffer ptr
 	unsigned int SSize=0;//sound size
 	unsigned int OSSize=0;//uncompresed sound size	
+	
+
 	char* msgBuf=nullptr;
 	unsigned int msPtr=0;
 	unsigned int msSize ;
@@ -52,6 +56,7 @@ public:
 	void FileHandler      ();
 	void ImageHandler     ();
 	void SondeHandler     ();
+	
 public:
 	unsigned int n_flags = 0;
 	void readHandler      ();
