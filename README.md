@@ -3,8 +3,9 @@
 <img src="Picturs/p1.png"></img>
 
 <h3>A cross-platform multi-threading peer-to-peer chatting app programmed in C++</h3>
+<hr></hr>
 </div>
-This app is still in alpha, also known as prototype, and is not stable
+
 
 ### It uses:
 - ASIO as the network library
