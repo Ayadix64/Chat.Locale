@@ -40,20 +40,20 @@ cd Chat.Locale
 ### Linux
 - For Arch systems:
 ``` bash
-  sudo pacman -Sy asio wxwidgets-gtk3 opencv portaudio
+  sudo pacman -Sy asio wxwidgets-gtk3 opencv portaudio qt6
 ```
 - For Debian/Ubuntu systems:
 ``` bash
 sudo apt update
-sudo apt-get install libwxgtk3.0-gtk3-dev libopencv-dev portaudio19-dev asio-dev
+sudo apt-get install libwxgtk3.0-gtk3-dev libopencv-dev portaudio19-dev qt6-base-dev asio-dev
 ```
 - If you have another distro, you will probably have the same libraries with the same or different naming
 ### BSD systems
 ``` bash
-sudo pkg install opencv portaudio wx32-gtk3 asio
+sudo pkg install opencv portaudio wx32-gtk3 asio qt6
 ```
 You will probably have the *pkg* package manager for every BSD distro, so this may run on every one
-
+- Note: it depend, but you may need to compile opencv by yourslefe if it dosnt work, prepare coffe...
 ### macOS
 ``` bash
 brew install wxwidgets opencv portaudio asio
