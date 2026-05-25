@@ -1,4 +1,5 @@
 #include "client.hpp"
+#include "login.hpp"
 #include "networking.hpp"
 #include <lz4.h>
 #include <mutex>
@@ -80,7 +81,6 @@ void connection::sendFile(std::string fileP)
 	memset(&fms, 0, sizeof(fms));
 		
 	unsigned int packsNeed = (fileS + std::min((unsigned int)fileName.size(),(unsigned int)sizeof(fms.data)) + sizeof(fms.data) -1)/sizeof(fms.data);
-	ms.msgL = fileS + packsNeed * (sizeof(ms) - sizeof(fms.data));
 
 	ms.Mgic = MAGIC;
 	ms.TYPE = MSFILE;
@@ -183,7 +183,6 @@ void connection::sendImage(unsigned int hight , unsigned int width , unsigned ch
 
 
 	unsigned int packsNeed = (Size + sizeof(ims.data) -1)/sizeof(ims.data);
-	ms.msgL = Size + packsNeed * (sizeof(ms) - sizeof(ims.data));
 
 	ms.Mgic = MAGIC;
 	ms.TYPE = IMAGE;
@@ -214,7 +213,7 @@ void connection::sendImage(unsigned int hight , unsigned int width , unsigned ch
 	}
 	
 
-	for(int i = 1; i < packsNeed  && imgData!=nullptr; i++){
+	for(unsigned int i = 1; i < packsNeed  && imgData!=nullptr; i++){
 		memset(ims.data, 0, sizeof(ims.data));
 		memset(ms.data, 0, sizeof(ms.data));
 
@@ -277,7 +276,6 @@ void connection::sendSound(float* data__ , unsigned int ln){
 	memset(&sms, 0, sizeof(sms));
 		
 	unsigned int packsNeed = (Size + sizeof(sms.data) -1)/sizeof(sms.data);
-	ms.msgL = Size + packsNeed * (sizeof(ms) - sizeof(sms.data));
 
 	ms.Mgic = MAGIC;
 	ms.TYPE = SOUND;
@@ -352,7 +350,6 @@ void connection::sendClose(){
 	Packat msg ;
 	msg.TYPE =CLOSE;
 	msg.Mgic =MAGIC;
-	msg.msgL = 0;
 	bool ret = false;
 	sk.connect(ip::tcp::endpoint(adress , LISNT_PORT) , ec);
 	if(ec){
@@ -400,7 +397,6 @@ void connection::ping(){
 	Packat msg ;
 	msg.TYPE =PING;
 	msg.Mgic =MAGIC;
-	msg.msgL = 0;
 	bool ret = false;
 	sk.connect(ip::tcp::endpoint(adress , LISNT_PORT) , ec);
 	if(ec){
@@ -438,8 +434,8 @@ void connection::ping(){
 	}
 
 	name.clear();
-	for(int i = 0 ; i < msg.msgL ; i++){
-		name.push_back(msg.data[i]);
+	for(int i = 0 ; i < ((Pong*)msg.data)->NameLng ; i++){
+		name.push_back(((Pong*)msg.data)->data[i]);
 	}
 	closeSocket(sk);
 	m_operationOpend--;
@@ -471,7 +467,6 @@ void connection::sendMSG(std::string send_){
 	m_operationOpend++;
 	
 	msg.TYPE=MESSAGE;
-	msg.msgL=send.size();
 	msg.Mgic=MAGIC;
 	ms.msgl=send.size();
 	unsigned int packN =(send.size()+sizeof(Message::msg)-1)/sizeof(Message::msg);
@@ -506,17 +501,20 @@ void connection::sendMSG(std::string send_){
 
 
 void connection::sendPong(){
-	Packat Pong;
-	unsigned int sendS = std::min(sizeof(Packat::data) , user_name.size());
+	Packat pack;
+	Pong *pong = (Pong*)pack.data;
+	unsigned int sendS = std::min(sizeof(Pong::data) , user_name.size());
 	
-	Pong.msgL = sendS;
-	Pong.Mgic=MAGIC;
-	Pong.TYPE=PONG;
-
-	memcpy(Pong.data, user_name.c_str(), sendS);//it will be beter , if we send a warning her
+	pack.Mgic=MAGIC;
+	pack.TYPE=PONG;
+	
+	pong->flags = g_isTacher;
+	pong->NameLng=sendS;
+	memcpy(pong->data, user_name.c_str(), sendS);//it will be beter , if we send a warning her
 	ip::tcp::socket sk(*io);
 	std::error_code e;
 	sk.connect(ip::tcp::endpoint(adress,LISNT_PORT), e);
+	std::cout<<"\n"<<pong->data;
 	if(e){
 		logMsgs("ERORR SENDING PONG", e.message());
 		closeSocket(sk);
@@ -526,7 +524,7 @@ void connection::sendPong(){
 	m_operationOpend++;
 	
 	if(sk.is_open()){
-		sk.write_some(buffer(&Pong,PACKAT),e);
+		sk.write_some(buffer(&pack,PACKAT),e);
 		if(e){
 			logMsgs("ERORR SENDING PONG", e.message());
 			closeSocket(sk);

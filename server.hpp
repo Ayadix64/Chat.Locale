@@ -23,14 +23,14 @@ private:
 	std::string fileName;
 	std::ofstream file;//file pfstrime
 	char* mlc =nullptr;//file buffer
-	unsigned int ptr = 0;//file ptr
+	unsigned long ptr = 0;//file ptr
 	unsigned int fileNS = 0;//file name size
-	unsigned int fileS =0;	//file Size
+	unsigned long fileS =0;	//file Size
 	
 	
-	char* ImgB =nullptr;//image buffer
-	unsigned int Iptr;//image buffer ptr
-	unsigned int ISize;//image size
+	char* ImgB  =nullptr;//image buffer
+	unsigned int Iptr=0;//image buffer ptr
+	unsigned int ISize=0;//image size
 	
 	unsigned int imageWidth=0;//as it sounds
 	unsigned int imageHeight=0;
@@ -44,7 +44,7 @@ private:
 
 	char* msgBuf=nullptr;
 	unsigned int msPtr=0;
-	unsigned int msSize ;
+	unsigned int msSize=0;
 
 	io_context* io;	
 

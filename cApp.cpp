@@ -16,9 +16,6 @@ cApp::cApp(){
 }
 
 cApp::~cApp(){
-	soundIOStop();
-	CameraStop();
-	networking_stop();
 	logMsgs("CLOSING");
 	return;
 }
@@ -31,7 +28,7 @@ bool cApp::OnInit(){
 	}else{
 		
 		updateLogs();
-		soundIOInit();
+		//soundIOInit();
 		CameraStart();	
 		frame1 = new cMain();
 		frame1->Show();

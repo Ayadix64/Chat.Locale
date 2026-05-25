@@ -81,17 +81,21 @@ bool server::MsgIsIt(unsigned int a){
 
 void server::pingHandler(){
 	error_code ec;	
-	Packat msg ;
+	Packat pack ;
+	
+	pack.TYPE =PONG;
+	pack.Mgic =MAGIC;
+	Pong *pong = (Pong*)pack.data;
 
-	msg.TYPE =PONG;
-	msg.Mgic =MAGIC;
-	msg.msgL = std::min(user_name.size(),sizeof(Packat::data));
-	memset(msg.data, 0, sizeof(msg.data));
-	memcpy(msg.data, user_name.c_str(), (size_t)std::min((int)user_name.size() , PACKAT));
+	unsigned int pongSz = std::min((unsigned int)user_name.size() , (unsigned int)sizeof(Pong::data));
+	memcpy(pong->data, user_name.c_str(), pongSz);
+	
+	pong->NameLng=pongSz;
+	pong->flags=g_isTacher;
 	try{
 			
 		if(skt->is_open() && !ec){
-			skt->write_some(buffer(&msg , PACKAT/*user_name.size() +PACK_HS*/),ec);
+			skt->write_some(buffer(&pack , PACKAT),ec);
 			if(!ec){
 				skt->wait(skt->wait_write);
 
@@ -132,7 +136,7 @@ void server::FileHandler(){
 		//file.write((char*)(msfile->data+msfile->fileNameL), std::min((unsigned int)(sizeof(FileMs::data)-msfile->fileNameL) , msfile->dataSize-msfile->fileNameL));
 		
 		ptr=0;
-		for(int i = msfile->fileNameL ; i < std::min((unsigned int)sizeof(FileMs::data) , fileS);i++,ptr++){
+		for(int i = msfile->fileNameL ; i < std::min((unsigned long)sizeof(FileMs::data) , fileS);i++,ptr++){
 			mlc[ptr] = msfile->data[i];
 		}
 
@@ -144,7 +148,7 @@ void server::FileHandler(){
 		//file.write(msfile->data, std::min(msfile->dataSize , (unsigned int)((msfile->partN+1)*sizeof(FileMs::data) - msfile->partN*sizeof(FileMs::data))) );
 		
 		for(int i = 0 ; 
-			i <  std::min(fileS  , (unsigned int)((msfile->partN+1)*sizeof(FileMs::data))) -msfile->partN*sizeof(FileMs::data);
+			i <  std::min(fileS  , (unsigned long)((msfile->partN+1)*sizeof(FileMs::data))) -msfile->partN*sizeof(FileMs::data);
 			i++,ptr++){
 			mlc[ptr] = msfile->data[i];
 		}
@@ -358,8 +362,8 @@ void server::readHandler(){
 					}else if(MsgIsIt(PONG)){
 						logMsgs("PONG");
 						conction->name.clear();
-						for(int i =0 ; i < data->msgL ; i++ ){
-							conction->name.push_back(data->data[i]);
+						for(int i =0 ; i < std::min(((Pong*)(data->data))->NameLng,(unsigned int)sizeof(Pong::data)) ; i++ ){
+							conction->name.push_back(((Pong*)(data->data))->data[i]);//isnt that reducles?
 						}
 					}
 

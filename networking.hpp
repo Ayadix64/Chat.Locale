@@ -61,7 +61,7 @@ using namespace asio;
 #define PACKAT 0x10000
 
 
-#define PACK_HS 20// Message hader size sizeof int*2+long = long+long = 8+8 = 16 , maths
+#define PACK_HS 12// Message hader size sizeof long + int = 12, maths
 
 void closeSocket(ip::tcp::socket& skt);
 
@@ -70,44 +70,48 @@ void closeSocket(ip::tcp::socket& skt);
 
 
 struct Packat {
-		unsigned int   TYPE  = PING       ;
-		unsigned long  Mgic  = MAGIC      ;
-		unsigned long  msgL  = 0          ;
-		char data [PACKAT-PACK_HS];
+	unsigned int   TYPE  = PING       ;
+	unsigned long  Mgic  = MAGIC      ;
+	char data [PACKAT-PACK_HS];
 }__attribute__((packed)) ;
 
 struct Message{
 	unsigned int packN = 0;
 	unsigned int msgl  = 0;
-	char msg         [PACKAT-PACK_HS-8]      ;
+	char msg  [PACKAT-PACK_HS-8]      ;
 
 };
 struct FileMs {//it livs in Message::MES
 
-		unsigned int  fileNameL = 0       ;
-		unsigned long partN     = 0       ;
-		unsigned long dataSize  = 0       ;
+	unsigned int  fileNameL = 0       ;
+	unsigned long partN     = 0       ;
+	unsigned long dataSize  = 0       ;
 
-		char data [PACKAT-PACK_HS-20] ;
+	char data [PACKAT-PACK_HS-20] ;
 }__attribute__((packed)) ;
 
 struct ImageMs {//it livs in Message::MES
-		unsigned int packN     = 0       ;
-		unsigned int ImgWidht  = 0       ;
-		unsigned int ImgHight  = 0       ;
-		unsigned int DataSize  = 0       ;//becuse it will be compresed and decompresed
-		char data [PACKAT-PACK_HS-16]    ;
+	unsigned int packN     = 0       ;
+	unsigned int ImgWidht  = 0       ;
+	unsigned int ImgHight  = 0       ;
+	unsigned int DataSize  = 0       ;//becuse it will be compresed and decompresed
+	char data [PACKAT-PACK_HS-16]    ;
 }__attribute__((packed)) ;
 
 
 struct SoundMs {//it livs in Message::MES
-		unsigned int packN     = 0         ;
-		unsigned int Size      = 0         ;//this one is float , so size*sizeof(float) , iow : devide the size to 4
-		unsigned int OSize     = 0         ;//original uncompreseed data size
-		unsigned char data [(PACKAT-PACK_HS-8)]  ;
+	unsigned int packN     = 0         ;
+	unsigned int Size      = 0         ;//this one is float , so size*sizeof(float) , iow : devide the size to 4
+	unsigned int OSize     = 0         ;//original uncompreseed data size
+	unsigned char data [(PACKAT-PACK_HS-8)]  ;
 }__attribute__((packed)) ;
 
 
+struct Pong {
+	unsigned short flags = 0;
+	unsigned int NameLng=0;
+	unsigned char data [(PACKAT-PACK_HS-6)]  ;
+}__attribute__((packed));
 
 
 

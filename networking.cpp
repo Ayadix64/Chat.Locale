@@ -58,9 +58,9 @@ void DevInNetwork::connect(){
 					skt->async_read_some(buffer((char*)ping, PACKAT) , [&](std::error_code ecc, size_t llg){
 						if(!ecc && ping->TYPE==PONG){
 							is_open=true;
-							name="";
-							for(int i = 0 ; i < ping->msgL ; i++){
-								name.push_back(ping->data[i]);
+							name.clear();
+							for(int i = 0 ; i < std::min((unsigned int)((Pong*)ping->data)->NameLng,(unsigned int)sizeof(Pong::data)) ; i++){
+								name.push_back(((Pong*)ping->data)->data[i]);
 							}
 							logMsgs("FIND", name);
 							FindHandler();
