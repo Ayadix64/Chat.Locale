@@ -23,6 +23,6 @@ include(UsewxWidgets)
 
 
 
-add_executable(main main.cpp cApp.cpp cMain.cpp networking.cpp client.cpp server.cpp config.cpp login.cpp camera.cpp soundIO.cpp screenCapturing.cpp)
+add_executable(main src/main.cpp src/cApp.cpp src/cMain.cpp src/networking.cpp src/client.cpp src/server.cpp src/config.cpp src/login.cpp src/camera.cpp src/soundIO.cpp src/screenCapturing.cpp)
 #target_link_libraries(main Qt6::Widgets)
 target_link_libraries( main ${OpenCV_LIBS} ${wxWidgets_LIBRARIES} ${PORTAUDIO_LIBRARIES} X11::X11 PkgConfig::lz4 zstd)
