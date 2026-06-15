@@ -93,6 +93,7 @@ And you will have a *main* file in your folder to go.
 ## Notes&Bugs:
 - after evry satings changing , you may need to restart the app (working on it)
 - somtimes network discovring shows blank text (somtime)
+- somtimes it dosnt close
 ## Future Plane
 - re writing the gui side with a defrent library (sorry wxWidgets fans, but my brain cant geet the parncipile, i am more in low level to get this)
 - add a good text message gui
