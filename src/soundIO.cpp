@@ -43,6 +43,7 @@ void soundThreadFunction(){
 		g_soundHaveBeenRecorde=false;
 
 	}
+	logMsgs("SOUND RECORDING & SEDNIG THREAD CLOSED");
 }
 
 
