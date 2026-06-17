@@ -386,10 +386,7 @@ void server::readHandler(){
 				
 			}else{
 				if(ec.value() == asio::error::eof){
-					//logMsgs("END-DELETING", "Entry #"+std::to_string(entry));
-					
 					closeSocket(*skt);
-					
 					
 				}else if(ec.value() == asio::error::operation_aborted){
 					logMsgs("SERVER FATEL ERROR --OA--", ec.message());
@@ -399,34 +396,7 @@ void server::readHandler(){
 					closeSocket(*skt);	
 				}
 				if(isOpen){	
-					delete skt;
-					isOpen=false;
-					if(SondB!=nullptr){
-						FREE(SondB);
-						SondB=nullptr;
-					}
-					if(mlc!=nullptr){
-						FREE(mlc);
-						mlc=nullptr;
-					}
-					if(ImgB!=nullptr){
-						FREE(ImgB);
-						ImgB=nullptr;
-					}
-					if(Messag_.size())Messag_.erase();
-					if(this->data!=nullptr){
-						FREE(this->data);
-						this->data=nullptr;
-					}
-					if(this->resevedData!=nullptr){
-						FREE(this->resevedData);
-						this->resevedData=nullptr;
-					}
-					this->conction->serverOpnedFromeDestny--;
-					
 					delete this;
-					//io->stop();
-					//delete this;
 				}
 				return ;
 			}

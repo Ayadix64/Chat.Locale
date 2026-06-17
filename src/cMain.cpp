@@ -77,6 +77,12 @@ wxBitmap Mat2Bitmap(cv::Mat& frame){
 	return wxBitmap(image);
 }
 
+
+
+
+
+
+
 #define WINDOW_DEFULT_W 1200
 #define WINDOW_DEFULT_H 800
 #define WINDOW_MIN_W 640
@@ -140,8 +146,39 @@ bool getVideoPrefernese(){
 }
 
 
+unsigned int getDefaultCamera(){
+
+	unsigned int conf = 0;
+	std::string inConf;
+	if(readConf(USER_CONFIG, DEFAULT_CAMERA_CONFIG, inConf)){
+		conf=std::stoi(inConf);
+	}
+	return conf;
+
+
+}
+
+void InitDepndences(){
+	updateLogs();
+	networking_init();
+	soundIOInit();
+	CameraStart(getDefaultCamera());
+	return;
+}
+
+void CloseDependinces(){
+	soundIOStop();
+	CameraStop();
+	networking_stop();
+	return;
+}
+
+
 
 cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , wxSize(GetWindowSize().x,GetWindowSize().y)){
+	InitDepndences();
+
+
 	satingswindow = new Satings(satingsOpen);
 	//Menus***********************************************************************
 	wxFont headLineF(wxFontInfo(wxSize(0,36)).Bold());
@@ -490,9 +527,7 @@ cMain::~cMain(){
 	if(m_senderThread.joinable()){
 		m_senderThread.join();
 	}
-	soundIOStop();
-	CameraStop();
-	networking_stop();
+	CloseDependinces();
 	return;
 }
 
@@ -632,7 +667,7 @@ void cMainLogIn::OnButtonClicked(wxCommandEvent& evnt){
 		evnt.Skip();
 		workwindow = new cMain();
 		this->Close();
-		soundIOInit();
+
 		workwindow->Show();
 	}else {
 		wxMessageBox("Name is requared");

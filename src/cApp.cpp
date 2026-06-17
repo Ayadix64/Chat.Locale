@@ -20,16 +20,10 @@ cApp::~cApp(){
 	return;
 }
 bool cApp::OnInit(){
-		
-	networking_init();	
 	if(needLogin()){
 		login = new cMainLogIn();
 		login->Show();
 	}else{
-		
-		updateLogs();
-		//soundIOInit();
-		CameraStart();	
 		frame1 = new cMain();
 		frame1->Show();
 		

@@ -7,10 +7,11 @@
 #include <asio/ts/buffer.hpp>
 #include <asio/ts/internet.hpp>
 
-#define WINDOW_WIDTH_CONFIG  "window_w"
-#define WINDOW_HEIGTH_CONFIG "window_h"
-#define SOUND_ALLOW_CONFIG  "AllowSendSound"
-#define VIDEO_ALLOW_CONFIG  "AllowSendVideo"
+#define WINDOW_WIDTH_CONFIG    "window_w"
+#define WINDOW_HEIGTH_CONFIG   "window_h"
+#define SOUND_ALLOW_CONFIG     "allow_send_sound"
+#define VIDEO_ALLOW_CONFIG     "allow_send_video"
+#define DEFAULT_CAMERA_CONFIG  "default_camera"
 
 
 
