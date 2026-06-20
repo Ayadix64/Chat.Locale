@@ -516,6 +516,11 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 cMain::~cMain(){
 	writeConf(USER_CONFIG, SOUND_ALLOW_CONFIG, allowSoundRecording?"true":"false");
 	writeConf(USER_CONFIG, VIDEO_ALLOW_CONFIG, allowRecording?"true":"false");
+	
+	writeConf(USER_CONFIG, WINDOW_WIDTH_CONFIG, std::to_string(this->m_width));
+	writeConf(USER_CONFIG, WINDOW_HEIGTH_CONFIG, std::to_string(this->m_height));
+	
+
 	SholdClose=true;
 	stopCapturing=true;
 	muteSpekers=true;
@@ -523,6 +528,7 @@ cMain::~cMain(){
 
 	if(timer){
 		timer->Stop();
+		
 	}
 	if(m_senderThread.joinable()){
 		m_senderThread.join();
