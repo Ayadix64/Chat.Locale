@@ -80,6 +80,7 @@ void DevInNetwork::connect(){
 		}
 
 	});
+	return;
 }
 
 void DevInNetwork::FindHandler(){
@@ -280,7 +281,7 @@ void networking_stop(){
 	}*/
 	unsigned int start_waiting = clock()/(CLOCKS_PER_SEC*1000);
 	const unsigned int timesup = 1000;
-	while (threadsAreOn && (clock()/(CLOCKS_PER_SEC*1000) - start_waiting) < timesup) {std::cout<<".";}
+	while (threadsAreOn && ((clock()/(CLOCKS_PER_SEC*1000) - start_waiting) < timesup )) {std::cout<<".";}
 	logMsgs("NETWORKING CLOSED");
 	delete acceptor;
 	delete serverContext;
