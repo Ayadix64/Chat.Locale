@@ -252,7 +252,7 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 				Conection(CleintDevID)->sendImage(h, w,data);
 				Conection(CleintDevID)->sendImage(h, w,data);//if somthing heppen to the data ther , we have to resend it
 			}else if(g_isTacher){
-				for(int ii = 0 ; ii < 3 ; i++){
+				for(int ii = 0 ; ii < 3 ; ii++){
 					for(int i = 0 ; i < ConctionsMatrixSize() ; i++){
 						connection* cc = GetConectionIn(i); 
 						if(cc!=nullptr){
