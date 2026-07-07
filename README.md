@@ -25,7 +25,7 @@
 - audio/image lz4 comprassing
 - cross platform (linux/macos/bsd's/windows)
 - multi threading uses
-
+- and no servers requared, your device is the server.
 
 The code itself is in **ALPHA** stage, but I'm still developing it to make it as stable as possible
 
