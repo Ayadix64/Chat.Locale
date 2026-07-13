@@ -14,11 +14,11 @@ class connection:
 	
 	asio::ip::address adress;
 	asio::io_context* io=nullptr;
-	
+	asio::ip::tcp::socket* sk=nullptr;
 	
 	friend class server;	
 	unsigned int serverOpnedFromeDestny = 0;
-
+	
 	
 	unsigned long ID=0;
 	unsigned long getUsebelID();//this .. do what is sounds it do
@@ -26,6 +26,7 @@ class connection:
 	std::atomic<bool> m_close = false;
 
 	std::atomic<unsigned int> m_operationOpend=0;
+	void waitForReady();
 
 public:
 	std::string name;

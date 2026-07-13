@@ -71,13 +71,29 @@ std::function<void(std::string fileName,unsigned int size,unsigned int ID)> file
 
 
 
-
+/****************************************************************************************
+ * TODO: THIS IS HORBALE MEMORY RE-ALOOCING, AND IT IS HAVY AND NOT POROFORME, FIX THAT!*
+ ****************************************************************************************/
 
 
 
 bool server::MsgIsIt(unsigned int a){
 	return data->TYPE == a & data->Mgic ==MAGIC;
 }
+
+
+void server::SendReady(){
+	return;
+	Packat redyseg={.TYPE=READY,.Mgic=MAGIC};
+	error_code ec;
+	skt->write_some(buffer(&redyseg , PACKAT),ec);
+	if(!ec){
+		skt->wait(skt->wait_write);
+
+	}
+
+}
+
 
 void server::pingHandler(){
 	error_code ec;	
@@ -130,7 +146,9 @@ void server::FileHandler(){
 		/**/
 
 		fileName.insert(0,donwloadF+"/");
+		
 		mlc = (char*)malloc(msfile->dataSize);
+		
 		file.open(fileName );
 		
 		//file.write((char*)(msfile->data+msfile->fileNameL), std::min((unsigned int)(sizeof(FileMs::data)-msfile->fileNameL) , msfile->dataSize-msfile->fileNameL));
@@ -152,6 +170,7 @@ void server::FileHandler(){
 			i++,ptr++){
 			mlc[ptr] = msfile->data[i];
 		}
+		
 		//logMsgs(std::to_string(ptr), "");
 		//file.close();
 									
@@ -174,6 +193,8 @@ void server::FileHandler(){
 		fileS=0;
 		file.close();
 		return;
+	}else {
+		SendReady();
 	}
 
 	return;
@@ -226,6 +247,8 @@ void server::ImageHandler(){
 		Iptr=0;
 		return;
 
+	}else {
+		SendReady();
 	}
 	return;
 }
@@ -264,6 +287,8 @@ void server::SondeHandler(){
 		OSSize=0;
 		Sptr=0;
 
+	}else {
+		SendReady();
 	}
 
 	return;
@@ -300,6 +325,8 @@ void server::MessageHandler(){
 		msSize=0;
 		msPtr=0;
 
+	}else {
+		SendReady();
 	}
 	return;
 
