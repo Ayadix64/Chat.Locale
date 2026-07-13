@@ -56,7 +56,6 @@ private:
 	void FileHandler      ();
 	void ImageHandler     ();
 	void SondeHandler     ();
-	void SendReady	      ();
 	
 public:
 	unsigned int n_flags = 0;

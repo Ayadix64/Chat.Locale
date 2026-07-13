@@ -26,7 +26,6 @@ class connection:
 	std::atomic<bool> m_close = false;
 
 	std::atomic<unsigned int> m_operationOpend=0;
-	void waitForReady();
 
 public:
 	std::string name;

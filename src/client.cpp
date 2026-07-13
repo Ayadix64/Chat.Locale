@@ -63,29 +63,6 @@ connection::~connection(){
 }
 
 
-void connection::waitForReady(){
-	return;
-	int i =0;
-	bool timeout=true;
-	Packat pack;
-	error_code ec;
-	for(;i<1000000;i++){
-		sk->wait(sk->wait_read);
-		sk->read_some(buffer(&pack,sizeof(pack)),ec);
-		if(ec){timeout=false;break;}
-		if(pack.Mgic==MAGIC && pack.TYPE==READY){timeout=false;break;}
-	}
-	if(timeout){
-		logMsgsErr("Times out waiting fgr ready segnel @" +this->adress.to_string() + ", moving on");
-	}
-	if(ec){
-		logMsgsErr("Erprrs recording while wating for @ "+this->adress.to_string()+", Erorr Message : " + ec.message());
-	}
-	return;
-
-}
-
-
 void connection::sendFile(std::string fileP)
 {
 	if(m_close)return;
@@ -162,7 +139,6 @@ void connection::sendFile(std::string fileP)
 	sk->wait(sk->wait_write);
 
 	for(int i = 1; i < packsNeed ; i++){
-		waitForReady();
 		memset(fms.data, 0, sizeof(fms.data));
 		memset(ms.data, 0, sizeof(ms.data));
 
@@ -255,7 +231,6 @@ void connection::sendImage(unsigned int hight , unsigned int width , unsigned ch
 	
 
 	for(unsigned int i = 1; i < packsNeed  && imgData!=nullptr; i++){
-		waitForReady();
 		memset(ims.data, 0, sizeof(ims.data));
 		memset(ms.data, 0, sizeof(ms.data));
 
@@ -342,7 +317,6 @@ void connection::sendSound(float* data__ , unsigned int ln){
 	sk->wait(sk->wait_write);
 
 	for(int i = 1; i < packsNeed  && data!=nullptr; i++){
-		waitForReady();
 		memset(sms.data, 0, sizeof(sms.data));
 		memset(ms.data, 0, sizeof(ms.data));
 
@@ -512,9 +486,6 @@ void connection::sendMSG(std::string send_){
 				return ;
 			}
 			sk->wait(sk->wait_write);
-			if(i+1<packN){
-				waitForReady();
-			}	
 		
 		}catch (system_error err){
 			logMsgsErr(err.what());

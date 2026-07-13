@@ -82,17 +82,6 @@ bool server::MsgIsIt(unsigned int a){
 }
 
 
-void server::SendReady(){
-	return;
-	Packat redyseg={.TYPE=READY,.Mgic=MAGIC};
-	error_code ec;
-	skt->write_some(buffer(&redyseg , PACKAT),ec);
-	if(!ec){
-		skt->wait(skt->wait_write);
-
-	}
-
-}
 
 
 void server::pingHandler(){
@@ -193,10 +182,7 @@ void server::FileHandler(){
 		fileS=0;
 		file.close();
 		return;
-	}else {
-		SendReady();
 	}
-
 	return;
 
 
@@ -247,10 +233,7 @@ void server::ImageHandler(){
 		Iptr=0;
 		return;
 
-	}else {
-		SendReady();
-	}
-	return;
+	}	return;
 }
 void server::SondeHandler(){
 	SoundMs * msSound = (SoundMs*)data->data;
@@ -287,10 +270,7 @@ void server::SondeHandler(){
 		OSSize=0;
 		Sptr=0;
 
-	}else {
-		SendReady();
 	}
-
 	return;
 }
 
@@ -325,8 +305,6 @@ void server::MessageHandler(){
 		msSize=0;
 		msPtr=0;
 
-	}else {
-		SendReady();
 	}
 	return;
 
