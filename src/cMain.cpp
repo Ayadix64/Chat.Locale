@@ -1,6 +1,11 @@
+#include <asio/error_code.hpp>
 #include <asio/ip/address_v4.hpp>
 #include <cstring>
 
+#include <exception>
+#include <opencv2/core/hal/interface.h>
+#include <opencv2/core/types.hpp>
+#include <opencv2/imgcodecs.hpp>
 #include <wx/wx.h>
 #include <cstdio>
 #include <cstdlib>
@@ -336,13 +341,16 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 	imageHandlingReq = [&](Image& img,unsigned int id){
 
 		if(id==CleintDevID){
+				
 			char* imageBitMapReseved = (char*)malloc(img.ImgHight*img.ImgWidht*3);
 			memcpy(imageBitMapReseved, img.imgBitmap, img.ImgHight*img.ImgWidht*3);
 			
 			wxImage* image = new wxImage(img.ImgWidht,img.ImgHight,(uchar*)imageBitMapReseved , true);
 			
-			CallAfter([this,image,imageBitMapReseved,screenVe](){
-			    	unsigned int ix = imageScreen->m_width, iy = imageScreen->m_height;
+			CallAfter([this,image,imageBitMapReseved,screenVe,img](){
+			    	
+
+				unsigned int ix = imageScreen->m_width, iy = imageScreen->m_height;
 				
 				imageScreen->SetBitmap(wxBitmap(*image));
 			    	
@@ -574,7 +582,7 @@ void cMain::OnTextBoxPressEnter(wxCommandEvent & evt){
 		wxMessageBox("ERR: Sending to nowhere");
 	}
 	evt.Skip();
-
+	
 }
 
 

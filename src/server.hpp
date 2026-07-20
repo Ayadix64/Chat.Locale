@@ -13,7 +13,7 @@ private:
 	std::shared_ptr<connection> conction;
 	
 	ip::tcp::socket*skt;
-	Packat *data=nullptr;
+	Packat data;
 	Packat *resevedData=nullptr;
 	unsigned int dataPtr = 0;
 

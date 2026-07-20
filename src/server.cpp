@@ -25,6 +25,7 @@
 #include <thread>
 #include <unistd.h>
 #include <lz4.h>
+#include <opencv2/opencv.hpp>
 #include <zstd.h>
 extern std::vector<std::shared_ptr<connection>> cone;
 
@@ -78,7 +79,7 @@ std::function<void(std::string fileName,unsigned int size,unsigned int ID)> file
 
 
 bool server::MsgIsIt(unsigned int a){
-	return data->TYPE == a & data->Mgic ==MAGIC;
+	return data.TYPE == a & data.Mgic ==MAGIC;
 }
 
 
@@ -118,7 +119,7 @@ void server::pingHandler(){
 	return;
 }
 void server::FileHandler(){
-	FileMs * msfile = (FileMs*)data->data;
+	FileMs * msfile = (FileMs*)data.data;
 	if(!msfile->partN){
 
 		fileName.erase();
@@ -191,12 +192,17 @@ void server::FileHandler(){
 
 
 void server::ImageHandler(){
-	ImageMs * msImg = (ImageMs*)data->data;
+	ImageMs * msImg = (ImageMs*)data.data;
 	if(!msImg->packN){
-		ISize = msImg->DataSize;
-		ImgB = (char*) malloc(ISize);
-		imageWidth=msImg->ImgWidht;
-		imageHeight=msImg->ImgHight;
+		if(msImg->ImgWidht!= imageWidth || msImg->ImgHight!=imageHeight){
+			ISize = msImg->DataSize;
+			if(ImgB){
+				ImgB=(char*)realloc(ImgB,ISize);
+			}
+			else{ImgB = (char*) malloc(ISize);}
+			imageWidth=msImg->ImgWidht;
+			imageHeight=msImg->ImgHight;
+		}
 		Iptr=0;
 		for(int i = 0 ; i < std::min((unsigned int)sizeof(ImageMs::data) , ISize);i++,Iptr++){
 			ImgB[Iptr] = msImg->data[Iptr];
@@ -218,8 +224,9 @@ void server::ImageHandler(){
 		img.ImgHight = this->imageHeight;
 		img.ImgWidht = this->imageWidth;
 		img.imgBitmap = (char*)malloc(this->imageWidth*this->imageHeight*3);
-		LZ4_decompress_safe(ImgB, img.imgBitmap, std::min(ISize,this->imageHeight*this->imageWidth*3), this->imageHeight*this->imageWidth*3);	
-		//ZSTD_decompress(img.imgBitmap, this->imageHeight*this->imageWidth*3, this->ImgB, std::min(this->ISize,(unsigned int)ZSTD_compressBound(this->imageWidth*this->imageHeight*3)));
+		//LZ4_decompress_safe(ImgB, img.imgBitmap, std::min(ISize,this->imageHeight*this->imageWidth*3), this->imageHeight*this->imageWidth*3);	
+		ZSTD_decompress(img.imgBitmap, this->imageHeight*this->imageWidth*3
+			, this->ImgB, std::min(this->ISize,(unsigned int)ZSTD_compressBound(this->imageWidth*this->imageHeight*3)));
 		imageHandlingReq(img,conction->ID);
 		FREE(img.imgBitmap)
 		
@@ -236,7 +243,7 @@ void server::ImageHandler(){
 	}	return;
 }
 void server::SondeHandler(){
-	SoundMs * msSound = (SoundMs*)data->data;
+	SoundMs * msSound = (SoundMs*)data.data;
 	if(!msSound->packN){
 		SSize = msSound->Size ;
 		if(SondB!=nullptr){FREE(SondB)}
@@ -259,7 +266,7 @@ void server::SondeHandler(){
 	}
 	if(Sptr >= SSize){
 		float* sbuff = (float*)malloc(OSSize);
-		LZ4_decompress_safe((const char*)SondB, (char*)sbuff, SSize, OSSize);
+		ZSTD_decompress(sbuff, OSSize, SondB, SSize);
 		soundHandlerRequast(sbuff,OSSize/4,conction->ID);
 		FREE(sbuff);
 		if(SondB!=nullptr){
@@ -276,7 +283,7 @@ void server::SondeHandler(){
 
 void server::MessageHandler(){
 	
-	Message * msg = (Message*)data->data;
+	Message * msg = (Message*)data.data;
 	if(!msg->packN){
 		msSize = msg->msgl;
 		msgBuf = (char*) malloc(msSize);
@@ -318,25 +325,22 @@ void server::close(){
 		delete skt;
 
 		if(SondB!=nullptr){
-		FREE(SondB);
-		SondB=nullptr;
+			FREE(SondB);
+			SondB=nullptr;
 		}
 		if(mlc!=nullptr){
-		FREE(mlc);
-		mlc=nullptr;
+			FREE(mlc);
+			mlc=nullptr;
 		}
 		if(ImgB!=nullptr){
-		FREE(ImgB);
-		ImgB=nullptr;
+			FREE(ImgB);
+			ImgB=nullptr;
 		}
 		if(Messag_.size())Messag_.erase();
-		if(this->data!=nullptr){
-		FREE(this->data);
-		this->data=nullptr;
-		}
+		
 		if(this->resevedData!=nullptr){
-		FREE(this->resevedData);
-		this->resevedData=nullptr;
+			FREE(this->resevedData);
+			this->resevedData=nullptr;
 		}
 		this->conction->serverOpnedFromeDestny--;
 	}
@@ -357,7 +361,7 @@ void server::CloseHandler(){
 void server::readHandler(){
 	try{
 		
-		asio::async_read(*skt,buffer(data,PACKAT) , [=](error_code ec, size_t leng){
+		asio::async_read(*skt,buffer(&data,PACKAT) , [=](error_code ec, size_t leng){
 			if(!ec){
 				
 				if(skt->is_open()){
@@ -367,8 +371,8 @@ void server::readHandler(){
 					}else if(MsgIsIt(PONG)){
 						logMsgs("PONG");
 						conction->name.clear();
-						for(int i =0 ; i < std::min(((Pong*)(data->data))->NameLng,(unsigned int)sizeof(Pong::data)) ; i++ ){
-							conction->name.push_back(((Pong*)(data->data))->data[i]);//isnt that reducles?
+						for(int i =0 ; i < std::min(((Pong*)(data.data))->NameLng,(unsigned int)sizeof(Pong::data)) ; i++ ){
+							conction->name.push_back(((Pong*)(data.data))->data[i]);//isnt that reducles?
 						}
 					}
 
@@ -420,7 +424,6 @@ server::server(ip::tcp::socket &skt , std::shared_ptr<connection>& con , io_cont
 
 	this->conction = con;
 	isOpen=true;
-	data=(Packat*)malloc(PACKAT);
 	server_count++;	
 	this->conction->serverOpnedFromeDestny++;
 	
@@ -447,10 +450,7 @@ server::~server(){
 			ImgB=nullptr;
 		}
 		if(Messag_.size())Messag_.erase();
-		if(this->data!=nullptr){
-			FREE(this->data);
-			this->data=nullptr;
-		}
+		
 		if(this->resevedData!=nullptr){
 			FREE(this->resevedData);
 			this->resevedData=nullptr;

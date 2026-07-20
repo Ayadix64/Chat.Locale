@@ -7,9 +7,13 @@
 #include <cstddef>
 #include <lz4.h>
 #include <mutex>
+#include <opencv2/core/mat.hpp>
+#include <opencv2/imgcodecs.hpp>
 #include <ostream>
 #include <unistd.h>
 #include <zstd.h>
+#include <opencv2/opencv.hpp>
+
 std::mutex g_conection_vector_mutex;
 extern std::vector<std::shared_ptr<connection>> cone;
 
@@ -174,14 +178,16 @@ void connection::sendFile(std::string fileP)
 void connection::sendImage(unsigned int hight , unsigned int width , unsigned char* iData){
 	if(m_close)return;
 	unsigned int hi = hight, wi= width;
-	
-	unsigned int Size = LZ4_compressBound(hi*wi*3);//R8G8B8
+		
+	unsigned int Size = ZSTD_compressBound(hi*wi*3);//R8G8B8
 
 
 	char* imgData = (char*)malloc(Size);
 	//memcpy(imgData, iData, Size);	
 	
-	Size = LZ4_compress_default((const char*)iData, (char*)imgData, (int)hi*wi*3, (int)Size);
+	Size = ZSTD_compress(imgData, Size,iData, (int)hi*wi*3, 5);
+	
+	
 	error_code ec;
 	
 	if(ec || !sk->is_open()){
@@ -266,10 +272,10 @@ void connection::sendImage(unsigned int hight , unsigned int width , unsigned ch
 void connection::sendSound(float* data__ , unsigned int ln){
 	if(m_close)return;
 
-	unsigned int Size = LZ4_compressBound(ln*4);
+	unsigned int Size = ZSTD_compressBound(ln*4);
 	float* data = (float*)malloc(Size);
-	Size=LZ4_compress_default((const char*)data__, (char*)data, ln*4, Size);
-		
+	Size=ZSTD_compress(data__,ln*4, (char*)data, Size,5);
+	
 	error_code ec;
 	
 	if(ec || !sk->is_open()){
