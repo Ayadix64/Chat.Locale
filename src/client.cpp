@@ -397,7 +397,7 @@ void connection::Close(){
 		conectionBuf->erase(conectionBuf->begin() + pos);
 		g_conection_vector_mutex.unlock();
 	}else{
-		logMsgsErr("CONCTION OBJECT , nevr found his selfe :(");
+		logMsgsErr("CONCTION OBJECT , nevr found his selfe .");
 	}
 	return;
 }

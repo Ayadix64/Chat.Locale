@@ -150,7 +150,6 @@ public:
 	wxCheckBox * teacherBox;
 	wxTextCtrl *textBox = nullptr;
 	wxButton * btn1 = nullptr;
-
 	void OnButtonClicked(wxCommandEvent& evnt);
 };
 
