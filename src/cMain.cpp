@@ -172,6 +172,29 @@ void InitDepndences(){
 }
 
 void CloseDependinces(){
+	closeHandlerRequast=[&](int id){return ;};
+	readMsgHandlerRequast=[&](char* ms , unsigned int lng, unsigned int ID){
+		return ;		
+	};
+	cameraCapturingReq = [&](unsigned int w , unsigned int h , unsigned char* data){
+		return ;
+	};
+
+	soundHandlerRequast = [&](float* data, unsigned int Size , unsigned int ID){
+		return ;
+	};
+
+	readSoundFromMicrophoneHandler = [&](float* r , unsigned int bufferL){
+		return ;
+	};
+	closeHandlerRequast = [&](unsigned int id){
+		return ;
+	};
+	
+	fileHandlerRequastComplite = [&](std::string fn , unsigned int size , unsigned int ID){
+		return ;
+	};
+
 	soundIOStop();
 	CameraStop();
 	networking_stop();
@@ -182,8 +205,6 @@ void CloseDependinces(){
 
 cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , wxSize(GetWindowSize().x,GetWindowSize().y)){
 	InitDepndences();
-
-
 	satingswindow = new Satings(satingsOpen);
 	//Menus***********************************************************************
 	wxFont headLineF(wxFontInfo(wxSize(0,36)).Bold());
@@ -363,7 +384,7 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 	};
 	rootSizer->Add(Body ,1, wxEXPAND);
 
-
+	
 
 	this->SetSizer(rootSizer);
 	rootSizer->Layout();
@@ -408,7 +429,7 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 			}
 
 		}
-
+		return;
 	};
 
 	timer = new wxTimer(this);
@@ -440,6 +461,7 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 		}
 
 		e.Skip();
+		return ;
 
 	},timer->GetId());
 	timer->Start(100);
@@ -520,6 +542,7 @@ cMain::cMain() : wxFrame(nullptr,wxID_ANY , "Chat.Locale" , wxDefaultPosition , 
 				m_filesToSende.pop_back();
 			}
 		}
+		return ;
 	});	
 }
 
@@ -531,7 +554,7 @@ cMain::~cMain(){
 	writeConf(USER_CONFIG, WINDOW_WIDTH_CONFIG, std::to_string(this->m_width));
 	writeConf(USER_CONFIG, WINDOW_HEIGTH_CONFIG, std::to_string(this->m_height));
 	
-
+	
 	SholdClose=true;
 	stopCapturing=true;
 	muteSpekers=true;
@@ -539,11 +562,11 @@ cMain::~cMain(){
 
 	if(timer){
 		timer->Stop();
-		
 	}
 	if(m_senderThread.joinable()){
 		m_senderThread.join();
 	}
+	if(satingsOpen){satingswindow->Close(true);};
 	CloseDependinces();
 	return;
 }

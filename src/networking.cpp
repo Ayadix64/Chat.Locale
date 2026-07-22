@@ -260,7 +260,10 @@ void networking_stop(){
 	for(int i = 0 ; i < cone.size() ; i++){
 		cone[i]->sendClose();
 	}
-	
+	for(int i = 0 ; i < cone.size() ; i++){
+		cone[i]->Close();
+	}
+
 	if(serverThread.joinable()){
 		serverThread.join();
 	}
