@@ -12,7 +12,7 @@
 - wxWidgets as the GUI library
 - OpenCV for camera capturing
 - PortAudio for audio capturing
-- LZ4 as a comprising methode for camera sending
+- Zstd as a comprising methode for camera sending
 
 ### It can:
 - video/audio chating
@@ -22,7 +22,7 @@
 ### Futurs
 - end to end messaging
 - runs localy at your machine
-- audio/image lz4 comprassing
+- audio/image zstd comprassing
 - cross platform (linux/macos/bsd's/windows)
 - multi threading uses
 - and no servers requared, your device is the server.
